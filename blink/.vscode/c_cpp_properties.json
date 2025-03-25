@@ -1,0 +1,30 @@
+{
+    "configurations": [
+        {
+            "name": "ARM Cortex-M33",
+            "includePath": [
+                "${workspaceFolder}/src",
+                "/usr/arm-none-eabi/include"  // Path to ARM toolchain includes
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/arm-none-eabi-gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-arm",
+            "compilerArgs": [
+                "-mcpu=cortex-m33",
+                "-mthumb",
+                "-g",
+                "-Og"
+            ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/src",
+                    "/usr/arm-none-eabi/include"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        }
+    ],
+    "version": 4
+}

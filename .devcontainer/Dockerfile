@@ -1,0 +1,49 @@
+# Use Ubuntu 22.04 as the base image
+FROM ubuntu:22.04
+
+# Set non-interactive frontend to avoid prompts during installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update and install basic tools
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    g++ \
+    gdb \
+    cmake \
+    make \
+    git \
+    curl \
+    && apt-get clean
+
+# Install ARM GCC Toolchain for 32-bit ARM (Cortex-M, Cortex-R)
+RUN curl -Lo gcc-arm-none-eabi.tar.bz2 "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi.tar.bz2" \
+    && tar -xjf gcc-arm-none-eabi.tar.bz2 -C /opt \
+    && rm gcc-arm-none-eabi.tar.bz2 \
+    && ln -s /opt/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi/bin/* /usr/local/bin/
+
+# Install Node.js (includes npm)
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g npm
+
+# Install Python toolchain
+RUN apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-dev \
+    && ln -s /usr/bin/python3 /usr/bin/python \
+    && pip3 install --upgrade pip
+
+# Install additional tools for IntelliSense and development
+RUN apt-get install -y \
+    clang \
+    clang-format \
+    clang-tidy \
+    && pip3 install pylint
+
+# Set up working directory
+WORKDIR /workspace
+
+# Ensure PATH includes ARM tools
+ENV PATH="/usr/local/bin:${PATH}"

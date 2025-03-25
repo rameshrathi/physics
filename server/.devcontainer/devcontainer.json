@@ -1,0 +1,27 @@
+{
+    "name": "C/C++ DevContainer",
+    "dockerFile": "Dockerfile",
+    "runArgs": ["--init"],
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "C_Cpp.intelliSenseEngine": "default",
+                "C_Cpp.default.compilerPath": "/usr/bin/gcc",
+                "C_Cpp.default.includePath": [
+                    "/usr/include",
+                    "/usr/local/include",
+                    "${workspaceFolder}/include"
+                ]
+            },
+            "extensions": [
+                 "ms-vscode.cpptools",
+                "llvm-vs-code-extensions.vscode-clangd"
+            ]
+        }
+    },
+    "remoteUser": "vscode",
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+    ]
+}
+
