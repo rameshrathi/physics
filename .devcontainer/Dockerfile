@@ -17,10 +17,10 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean
 
 # Install ARM GCC Toolchain for 32-bit ARM (Cortex-M, Cortex-R)
-RUN curl -Lo gcc-arm-none-eabi.tar.bz2 "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi.tar.bz2" \
-    && tar -xjf gcc-arm-none-eabi.tar.bz2 -C /opt \
-    && rm gcc-arm-none-eabi.tar.bz2 \
-    && ln -s /opt/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi/bin/* /usr/local/bin/
+# RUN curl -Lo gcc-arm-none-eabi.tar.bz2 "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi.tar.bz2" \
+#     && tar -xjf gcc-arm-none-eabi.tar.bz2 -C /opt \
+#     && rm gcc-arm-none-eabi.tar.bz2 \
+#     && ln -s /opt/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi/bin/* /usr/local/bin/
 
 # Install Node.js (includes npm)
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \

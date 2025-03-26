@@ -2,7 +2,7 @@
     "name": "ARM Development",
     "build": {
         "dockerfile": "Dockerfile",
-        "context": ".."
+        "context": "."
     },
     "workspaceFolder": "/workspace",
     "settings": {

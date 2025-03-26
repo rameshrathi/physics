@@ -1,50 +1,41 @@
-# Toolchain definitions
+# Toolchain
 CC = arm-none-eabi-gcc
-LD = arm-none-eabi-gcc
+AS = arm-none-eabi-as
+LD = arm-none-eabi-ld
 OBJCOPY = arm-none-eabi-objcopy
 
-# Directory definitions
-SRC_DIR = src
+# Flags
+CFLAGS = -mcpu=cortex-m0plus -mthumb -O2
+LDFLAGS = -nostdlib -T link.ld
+
+# Directories
 BUILD_DIR = build
 
-# Compiler and linker flags
-# CFLAGS = -mcpu=cortex-m33 -mthumb -I $(SRC_DIR)
-CFLAGS = -mcpu=cortex-m33 -mthumb -I $(SRC_DIR) -g -Og
-LDFLAGS = -nostdlib -T $(SRC_DIR)/linker.ld
+# Source files
+SRCS = startup.s main.s
+OBJS = $(SRCS:%.s=$(BUILD_DIR)/%.o)
 
-# List of object files
-OBJECTS = $(BUILD_DIR)/main.o $(BUILD_DIR)/startup.o $(BUILD_DIR)/led.o $(BUILD_DIR)/adc.o $(BUILD_DIR)/uart.o $(BUILD_DIR)/delay.o
+# Target
+TARGET = $(BUILD_DIR)/program
 
-# Default target
-all: $(BUILD_DIR)/program.bin
+# Create build directory
+$(shell mkdir -p $(BUILD_DIR))
 
-# Generate binary from ELF
-$(BUILD_DIR)/program.bin: $(BUILD_DIR)/program.elf
+all: $(TARGET).bin
+
+# Compile assembly files
+$(BUILD_DIR)/%.o: %.s
+	$(AS) -mcpu=cortex-m0plus -mthumb -o $@ $
+
+# Link object files
+$(TARGET).elf: $(OBJS)
+	$(LD) $(LDFLAGS) -o $@ $^
+
+$(TARGET).bin: $(TARGET).elf
 	$(OBJCOPY) -O binary $< $@
 
-# Link object files into ELF
-$(BUILD_DIR)/program.elf: $(OBJECTS)
-	$(LD) $(LDFLAGS) $^ -o $@
+flash:
+	openocd -f interface/raspberrypi-swd.cfg -f target/rp2350.cfg -c "program $(TARGET).bin verify reset exit"
 
-# Compile root-level C files (main.c)
-$(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Compile C files from src/
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Compile assembly files from src/
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.s | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Create build directory if it doesn't exist
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
-
-# Clean up build artifacts
 clean:
 	rm -rf $(BUILD_DIR)
-
-# Declare phony targets
-.PHONY: all clean
