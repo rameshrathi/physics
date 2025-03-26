@@ -1,41 +1,42 @@
-# Toolchain
+# Makefile for RP2350 LED Blink
 CC = arm-none-eabi-gcc
 AS = arm-none-eabi-as
-LD = arm-none-eabi-ld
+LD = arm-none-eabi-gcc
 OBJCOPY = arm-none-eabi-objcopy
+SIZE = arm-none-eabi-size
 
-# Flags
-CFLAGS = -mcpu=cortex-m0plus -mthumb -O2
-LDFLAGS = -nostdlib -T link.ld
+ASFLAGS = -mcpu=cortex-m33 -mthumb
+LDFLAGS = -T rp2350.ld -nostartfiles
 
-# Directories
+# Build directory
 BUILD_DIR = build
 
-# Source files
-SRCS = startup.s main.s
-OBJS = $(SRCS:%.s=$(BUILD_DIR)/%.o)
+# Target and object files with build directory prefix
+TARGET = $(BUILD_DIR)/blink
+OBJECTS = $(BUILD_DIR)/startup.o $(BUILD_DIR)/main.o
 
-# Target
-TARGET = $(BUILD_DIR)/program
+all: $(BUILD_DIR) $(TARGET).bin
 
-# Create build directory
-$(shell mkdir -p $(BUILD_DIR))
+# Create build directory if it doesn't exist
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
-all: $(TARGET).bin
-
-# Compile assembly files
-$(BUILD_DIR)/%.o: %.s
-	$(AS) -mcpu=cortex-m0plus -mthumb -o $@ $
-
-# Link object files
-$(TARGET).elf: $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $^
+$(TARGET).elf: $(OBJECTS)
+	$(LD) $(LDFLAGS) -o $@ $(OBJECTS)
 
 $(TARGET).bin: $(TARGET).elf
 	$(OBJCOPY) -O binary $< $@
 
-flash:
-	openocd -f interface/raspberrypi-swd.cfg -f target/rp2350.cfg -c "program $(TARGET).bin verify reset exit"
+$(BUILD_DIR)/startup.o: startup.s
+	$(AS) $(ASFLAGS) -o $@ $<
+
+$(BUILD_DIR)/main.o: main.s
+	$(AS) $(ASFLAGS) -o $@ $<
 
 clean:
 	rm -rf $(BUILD_DIR)
+
+flash: $(TARGET).bin
+	picotool load -x $(TARGET).bin
+
+.PHONY: all clean flash

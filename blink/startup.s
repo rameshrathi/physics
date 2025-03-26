@@ -1,44 +1,49 @@
-.cpu cortex-m0plus
+@ startup.s - Startup Code for RP2350
 .syntax unified
+.cpu cortex-m33
 .thumb
 
-.global _start
+.section .vector_table, "a"
+.align 2
+.global _vectors
+_vectors:
+    .word 0x20041fff         @ Stack pointer (end of SRAM1, 256KB + 4KB)
+    .word reset_handler      @ Reset vector
+    .word nmi_handler        @ NMI handler
+    .word hardfault_handler  @ Hard Fault handler
+    .word 0                  @ Placeholder for unused vectors
+    .word 0
+    .word 0
+    .word 0
+    .word 0
+    .word 0
+    .word 0
+    .word 0
+    .word 0
+    .word 0
+    .word 0
+    .word systick_handler    @ SysTick handler (offset 15)
+
+.section .text
 .global reset_handler
-
-.section .vectors, "a"
-vector_table:
-    .word _stack_top
-    .word reset_handler
-
+.thumb_func
 reset_handler:
-    // Initialize system clock
-    bl system_init
-
-    // Initialize GPIO
-    bl gpio_init
-
-    // Jump to main application
+    ldr r0, =0x20041fff
+    mov sp, r0
     bl main
+hang:
+    b hang
 
-    // Halt if main returns
-    b .
+.thumb_func
+nmi_handler:
+    b hang
 
-system_init:
-    // Add any system clock or core initialization
+.thumb_func
+hardfault_handler:
+    b hang
+
+.thumb_func
+systick_handler:
     bx lr
 
-gpio_init:
-    // Global GPIO configuration
-    ldr r0, =GPIO_BASE
-    ldr r1, =SIO_BASE
-    
-    // Configure LED pin
-    movs r2, #5  // SIO function
-    str r2, [r0, #0xCC]  // GPIO control register
-    
-    // Set as output
-    movs r2, #1
-    lsls r2, r2, #25  // Assuming GPIO25
-    str r2, [r1, #0x24]  // GPIO output enable
-    
-    bx lr
+@ Ensure a newline follows this line
