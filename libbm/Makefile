@@ -1,40 +1,29 @@
-# Target name (output executable)
-TARGET = libbm
+# Toolchain
+CC = arm-none-eabi-gcc
+AS = arm-none-eabi-as
+LD = arm-none-eabi-ld
+OBJCOPY = arm-none-eabi-objcopy
 
-# Directories
-SRC_DIR = src
-BUILD_DIR = build
+# Flags
+CFLAGS = -mcpu=cortex-m0plus -mthumb -O2
+LDFLAGS = -nostdlib -T link.ld
 
-# Source files (all .c files in src/)
-SOURCES = $(wildcard $(SRC_DIR)/*.c)
+# Source files
+SRCS = startup.s main.s
 
-# Object files (in build directory)
-OBJECTS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SOURCES))
+# Output
+TARGET = blink
 
-# Compiler
-CC = cc
+all: $(TARGET).bin
 
-# Compiler flags
-CFLAGS = -g -Wall -O2
+$(TARGET).elf: $(SRCS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
-# Default target
-all: $(BUILD_DIR) $(BUILD_DIR)/$(TARGET)
+$(TARGET).bin: $(TARGET).elf
+	$(OBJCOPY) -O binary $< $@
 
-# Create build directory if it doesn’t exist
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
+flash:
+	openocd -f interface/raspberrypi-swd.cfg -f target/rp2350.cfg -c "program $(TARGET).bin verify reset exit"
 
-# Link object files into executable
-$(BUILD_DIR)/$(TARGET): $(OBJECTS)
-	$(CC) $(OBJECTS) -o $@
-
-# Compile .c files to object files
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Clean up
 clean:
-	rm -rf $(BUILD_DIR)
-
-# Phony targets
-.PHONY: all clean
+	rm -f *.elf *.bin
