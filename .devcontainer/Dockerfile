@@ -4,7 +4,7 @@ FROM ubuntu:22.04
 # Set non-interactive frontend to avoid prompts during installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update and install basic tools
+# Update and install basic tools (including xz-utils)
 RUN apt-get update && apt-get install -y \
     build-essential \
     gcc \
@@ -14,13 +14,14 @@ RUN apt-get update && apt-get install -y \
     make \
     git \
     curl \
+    xz-utils \
     && apt-get clean
 
 # Install ARM GCC Toolchain for 32-bit ARM (Cortex-M, Cortex-R)
-# RUN curl -Lo gcc-arm-none-eabi.tar.bz2 "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi.tar.bz2" \
-#     && tar -xjf gcc-arm-none-eabi.tar.bz2 -C /opt \
-#     && rm gcc-arm-none-eabi.tar.bz2 \
-#     && ln -s /opt/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi/bin/* /usr/local/bin/
+RUN curl -Lo gcc-arm-none-eabi.tar.xz "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binaries/arm-gnu-toolchain-12.3.rel1-aarch64-arm-none-eabi.tar.xz" \
+  && tar -xJf gcc-arm-none-eabi.tar.xz -C /opt \
+  && rm gcc-arm-none-eabi.tar.xz \
+  && ln -s /opt/arm-gnu-toolchain-12.3.rel1-aarch64-arm-none-eabi/bin/* /usr/local/bin/
 
 # Install Node.js (includes npm)
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
