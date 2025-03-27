@@ -8,6 +8,7 @@
         "stdint.h": "c",
         "limits.h": "c",
         "stdbool.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "scheduler.h": "c"
     }
 }
