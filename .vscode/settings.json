@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "unistd.h": "c",
+        "stdio.h": "c",
+        "wait.h": "c",
+        "types.h": "c",
+        "convert.h": "c",
+        "stdint.h": "c",
+        "limits.h": "c",
+        "stdbool.h": "c",
+        "stddef.h": "c"
+    }
+}

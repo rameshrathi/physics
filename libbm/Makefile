@@ -1,29 +1,28 @@
-# Toolchain
-CC = arm-none-eabi-gcc
-AS = arm-none-eabi-as
-LD = arm-none-eabi-ld
-OBJCOPY = arm-none-eabi-objcopy
+CC = gcc
+CFLAGS = -Wall -Wextra -I src/include
+SRC_DIR = src
+BUILD_DIR = build
+TARGET_LIB = libbm.a
+TARGET_EXE = main.out
 
-# Flags
-CFLAGS = -mcpu=cortex-m0plus -mthumb -O2
-LDFLAGS = -nostdlib -T link.ld
+SRCS := $(wildcard $(SRC_DIR)/*.c)
+OBJS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRCS))
 
-# Source files
-SRCS = startup.s main.s
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-# Output
-TARGET = blink
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
-all: $(TARGET).bin
+$(TARGET_LIB): $(OBJS)
+	ar rcs $(TARGET_LIB) $(OBJS)
 
-$(TARGET).elf: $(SRCS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+$(TARGET_EXE): $(OBJS)
+	$(CC) $(OBJS) -o $(TARGET_EXE)
 
-$(TARGET).bin: $(TARGET).elf
-	$(OBJCOPY) -O binary $< $@
-
-flash:
-	openocd -f interface/raspberrypi-swd.cfg -f target/rp2350.cfg -c "program $(TARGET).bin verify reset exit"
-
+.PHONY: clean run
 clean:
-	rm -f *.elf *.bin
+	rm -rf $(BUILD_DIR) $(TARGET_LIB) $(TARGET_EXE)
+
+run: $(TARGET_EXE)
+	./$(TARGET_EXE)
