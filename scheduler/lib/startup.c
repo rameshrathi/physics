@@ -16,7 +16,7 @@ void Default_Handler(void) {
 // Vector table placed in the .vectors section
 __attribute__((section(".vectors")))
 void (*const vector_table[])(void) = {
-    (void (*)(void))0x20007FFC,  // Initial stack pointer (adjust based on SRAM size)
+    (void (*)(void))0x20082000,  // Initial stack pointer (end of SRAM9)
     Reset_Handler,               // Reset handler
     Default_Handler,             // NMI
     Default_Handler,             // HardFault

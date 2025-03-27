@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.s": "arm-assembly",
+        "*.asm": "arm-assembly"
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/arm-none-eabi-gcc",
+    "C_Cpp.intelliSenseEngine": "default"
+}

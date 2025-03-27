@@ -1,50 +1,28 @@
-# Makefile for RP2350 (ARM Cortex-M33)
+CC = gcc
+CFLAGS = -Wall -Wextra -I src/include
+SRC_DIR = lib
+BUILD_DIR = build
+TARGET_LIB = libbm.a
+TARGET_EXE = main.out
 
-# Toolchain (adjust path to your ARM GCC toolchain)
-CC = arm-none-eabi-gcc
-LD = arm-none-eabi-ld
-OBJCOPY = arm-none-eabi-objcopy
-SIZE = arm-none-eabi-size
+SRCS := $(wildcard $(SRC_DIR)/*.c)
+OBJS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRCS))
 
-# Source files
-SOURCES = main.c scheduler.c startup.c
-OBJECTS = $(SOURCES:.c=.o)
-
-# Output files
-TARGET = scheduler
-ELF = $(TARGET).elf
-BIN = $(TARGET).bin
-
-# Compiler flags
-CFLAGS = -mcpu=cortex-m33 -mthumb -g -O0 -Wall -I.
-LDFLAGS = -mcpu=cortex-m33 -mthumb -nostartfiles -T linker.ld
-
-# Linker script (minimal)
-LINKER_SCRIPT = linker.ld
-
-# Default target
-all: $(BIN)
-
-# Compile .c to .o
-%.o: %.c
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Link objects to ELF
-$(ELF): $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
-# Convert ELF to BIN
-$(BIN): $(ELF)
-	$(OBJCOPY) -O binary $< $@
-	$(SIZE) $(ELF)
+$(TARGET_LIB): $(OBJS)
+	ar rcs $(TARGET_LIB) $(OBJS)
 
-# Clean up
+$(TARGET_EXE): $(OBJS)
+	$(CC) $(OBJS) -o $(TARGET_EXE)
+
+.PHONY: clean run
 clean:
-	rm -f $(OBJECTS) $(ELF) $(BIN)
+	rm -rf $(BUILD_DIR) $(TARGET_LIB) $(TARGET_EXE)
 
-# Flash (optional, requires openocd or similar)
-flash: $(BIN)
-	# Add your flashing command here, e.g., openocd
-	# openocd -f interface/cmsis-dap.cfg -f target/rp2350.cfg -c "program $(BIN) verify reset exit 0x10000000"
-
-.PHONY: all clean flash
+run: $(TARGET_EXE)
+	./$(TARGET_EXE)

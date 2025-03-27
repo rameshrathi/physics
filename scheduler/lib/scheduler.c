@@ -15,6 +15,8 @@ static int num_tasks = 0;      // Number of active tasks
 static int current_task = -1;  // Index of the currently running task
 
 // Stack allocation for each task (4KB per task)
+// Task stacks in a dedicated section for striped SRAM0-3
+__attribute__((section(".task_stacks")))
 static unsigned int task_stacks[MAX_TASKS][1024];
 
 // Initialize the scheduler with a configurable time slice
