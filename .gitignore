@@ -6,3 +6,4 @@ dist/
 .elf
 .bin
 .o
+.swiftpm
