@@ -4,13 +4,18 @@ import PackageDescription
 let package = Package(
 	name: "libbm",
 	targets: [
-		.executableTarget(
+		.target(
 			name: "libbm",
-			path: ".",
-			publicHeadersPath: "src/include",
+			path: "lib",
+			publicHeadersPath: "include",
 			cSettings: [
-				.unsafeFlags(["-std=c11"]) // C11 standard
+				.unsafeFlags(["-std=c11"])
 			]
+		),
+		.testTarget(
+			name: "libbmTest",
+			dependencies: ["libbm"],
+			path: "tests"
 		)
 	]
 )
