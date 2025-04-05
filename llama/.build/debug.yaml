@@ -1,0 +1,121 @@
+client:
+  name: basic
+  file-system: device-agnostic
+tools: {}
+targets:
+  "LibLlamaPackageTests-arm64-apple-macosx15.0-debug.module": ["<LibLlamaPackageTests-arm64-apple-macosx15.0-debug.module>"]
+  "LibLlamaPackageTests-arm64-apple-macosx15.0-debug.test": ["<LibLlamaPackageTests-arm64-apple-macosx15.0-debug.test>"]
+  "LibLlma-arm64-apple-macosx15.0-debug.module": ["<LibLlma-arm64-apple-macosx15.0-debug.module>"]
+  "LibLlmaTest-arm64-apple-macosx15.0-debug.module": ["<LibLlmaTest-arm64-apple-macosx15.0-debug.module>"]
+  "PackageStructure": ["<PackageStructure>"]
+  "main": ["<LibLlma-arm64-apple-macosx15.0-debug.module>"]
+  "test": ["<LibLlamaPackageTests-arm64-apple-macosx15.0-debug.test>","<LibLlma-arm64-apple-macosx15.0-debug.module>","<LibLlmaTest-arm64-apple-macosx15.0-debug.module>"]
+default: "main"
+nodes:
+  "/Users/ramesh/Documents/projects/examples/llama/Sources/LibLlma/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "/Users/ramesh/Documents/projects/examples/llama/Sources/library/llama.xcframework/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "/Users/ramesh/Documents/projects/examples/llama/Tests/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+commands:
+  "/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.derived/runner.swift"]
+    outputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/sources"]
+    description: "Write auxiliary file /Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/sources"
+
+  "/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.derived/runner.swift":
+    tool: test-entry-point-tool
+    inputs: []
+    outputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.derived/runner.swift"]
+
+  "/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.product/Objects.LinkFileList":
+    tool: write-auxiliary-file
+    inputs: ["<link-file-list>","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/runner.swift.o","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlma.build/LibLlma.swift.o","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlmaTest.build/LibLlmaTests.swift.o"]
+    outputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.product/Objects.LinkFileList"]
+    description: "Write auxiliary file /Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.product/Objects.LinkFileList"
+
+  "/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlma.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/Users/ramesh/Documents/projects/examples/llama/Sources/LibLlma/LibLlma.swift"]
+    outputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlma.build/sources"]
+    description: "Write auxiliary file /Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlma.build/sources"
+
+  "/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlmaTest.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/Users/ramesh/Documents/projects/examples/llama/Tests/LibLlmaTests/LibLlmaTests.swift"]
+    outputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlmaTest.build/sources"]
+    description: "Write auxiliary file /Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlmaTest.build/sources"
+
+  "/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/llama.framework":
+    tool: copy-tool
+    inputs: ["/Users/ramesh/Documents/projects/examples/llama/Sources/library/llama.xcframework/macos-arm64_x86_64/llama.framework/"]
+    outputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/llama.framework/"]
+    description: "Copying /Users/ramesh/Documents/projects/examples/llama/Sources/library/llama.xcframework/macos-arm64_x86_64/llama.framework"
+
+  "/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt":
+    tool: write-auxiliary-file
+    inputs: ["<swift-get-version>","/Library/Developer/CommandLineTools/usr/bin/swiftc"]
+    outputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"]
+    always-out-of-date: "true"
+    description: "Write auxiliary file /Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+
+  "<LibLlamaPackageTests-arm64-apple-macosx15.0-debug.module>":
+    tool: phony
+    inputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/runner.swift.o","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules/LibLlamaPackageTests.swiftmodule"]
+    outputs: ["<LibLlamaPackageTests-arm64-apple-macosx15.0-debug.module>"]
+
+  "<LibLlamaPackageTests-arm64-apple-macosx15.0-debug.test>":
+    tool: phony
+    inputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.xctest/Contents/MacOS/LibLlamaPackageTests"]
+    outputs: ["<LibLlamaPackageTests-arm64-apple-macosx15.0-debug.test>"]
+
+  "<LibLlma-arm64-apple-macosx15.0-debug.module>":
+    tool: phony
+    inputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlma.build/LibLlma.swift.o","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules/LibLlma.swiftmodule"]
+    outputs: ["<LibLlma-arm64-apple-macosx15.0-debug.module>"]
+
+  "<LibLlmaTest-arm64-apple-macosx15.0-debug.module>":
+    tool: phony
+    inputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlmaTest.build/LibLlmaTests.swift.o","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules/LibLlmaTest.swiftmodule"]
+    outputs: ["<LibLlmaTest-arm64-apple-macosx15.0-debug.module>"]
+
+  "C.LibLlamaPackageTests-arm64-apple-macosx15.0-debug.module":
+    tool: shell
+    inputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.derived/runner.swift","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules/LibLlmaTest.swiftmodule","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/llama.framework/","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/sources"]
+    outputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/runner.swift.o","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules/LibLlamaPackageTests.swiftmodule"]
+    description: "Compiling Swift Module 'LibLlamaPackageTests' (1 sources)"
+    args: ["/Library/Developer/CommandLineTools/usr/bin/swiftc","-module-name","LibLlamaPackageTests","-emit-dependencies","-emit-module","-emit-module-path","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules/LibLlamaPackageTests.swiftmodule","-output-file-map","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/output-file-map.json","-parse-as-library","-incremental","-c","@/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/sources","-I","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules","-target","arm64-apple-macosx10.13","-enable-batch-mode","-index-store-path","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/index/store","-Onone","-enable-testing","-j10","-DSWIFT_PACKAGE","-DDEBUG","-I","/Users/ramesh/Documents/projects/examples/llama/Sources/library/llama.xcframework/macos-arm64_x86_64","-Xcc","-I","-Xcc","/Users/ramesh/Documents/projects/examples/llama/Sources/library/llama.xcframework/macos-arm64_x86_64","-module-cache-path","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/ModuleCache","-parseable-output","-parse-as-library","-F","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug","-emit-objc-header","-emit-objc-header-path","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/LibLlamaPackageTests-Swift.h","-color-diagnostics","-F","/Library/Developer/CommandLineTools/Library/Developer/Frameworks","-sdk","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-g","-Xcc","-isysroot","-Xcc","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-Xcc","-fPIC","-Xcc","-g","-package-name","llama"]
+
+  "C.LibLlamaPackageTests-arm64-apple-macosx15.0-debug.test":
+    tool: shell
+    inputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/runner.swift.o","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlma.build/LibLlma.swift.o","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlmaTest.build/LibLlmaTests.swift.o","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.product/Objects.LinkFileList"]
+    outputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.xctest/Contents/MacOS/LibLlamaPackageTests"]
+    description: "Linking ./.build/arm64-apple-macosx/debug/LibLlamaPackageTests.xctest/Contents/MacOS/LibLlamaPackageTests"
+    args: ["/Library/Developer/CommandLineTools/usr/bin/swiftc","-framework","llama","-F","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug","-L","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug","-o","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.xctest/Contents/MacOS/LibLlamaPackageTests","-module-name","LibLlamaPackageTests","-Xlinker","-no_warn_duplicate_libraries","-Xlinker","-bundle","-Xlinker","-rpath","-Xlinker","@loader_path/../../../","@/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.product/Objects.LinkFileList","-Xlinker","-rpath","-Xlinker","/Library/Developer/CommandLineTools/usr/lib/swift-5.5/macosx","-target","arm64-apple-macosx10.13","-Xlinker","-add_ast_path","-Xlinker","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules/LibLlamaPackageTests.swiftmodule","-Xlinker","-add_ast_path","-Xlinker","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules/LibLlma.swiftmodule","-Xlinker","-add_ast_path","-Xlinker","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules/LibLlmaTest.swiftmodule","-F","/Library/Developer/CommandLineTools/Library/Developer/Frameworks","-sdk","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-g","-Xlinker","-rpath","-Xlinker","/Library/Developer/CommandLineTools/Library/Developer/Frameworks"]
+
+  "C.LibLlma-arm64-apple-macosx15.0-debug.module":
+    tool: shell
+    inputs: ["/Users/ramesh/Documents/projects/examples/llama/Sources/LibLlma/LibLlma.swift","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/llama.framework/","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlma.build/sources"]
+    outputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlma.build/LibLlma.swift.o","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules/LibLlma.swiftmodule"]
+    description: "Compiling Swift Module 'LibLlma' (1 sources)"
+    args: ["/Library/Developer/CommandLineTools/usr/bin/swiftc","-module-name","LibLlma","-emit-dependencies","-emit-module","-emit-module-path","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules/LibLlma.swiftmodule","-output-file-map","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlma.build/output-file-map.json","-parse-as-library","-incremental","-c","@/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlma.build/sources","-I","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules","-target","arm64-apple-macosx10.13","-enable-batch-mode","-index-store-path","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/index/store","-Onone","-enable-testing","-j10","-DSWIFT_PACKAGE","-DDEBUG","-I","/Users/ramesh/Documents/projects/examples/llama/Sources/library/llama.xcframework/macos-arm64_x86_64","-Xcc","-I","-Xcc","/Users/ramesh/Documents/projects/examples/llama/Sources/library/llama.xcframework/macos-arm64_x86_64","-module-cache-path","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/ModuleCache","-parseable-output","-parse-as-library","-F","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug","-emit-objc-header","-emit-objc-header-path","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlma.build/LibLlma-Swift.h","-color-diagnostics","-swift-version","6","-F","/Library/Developer/CommandLineTools/Library/Developer/Frameworks","-sdk","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-g","-Xcc","-isysroot","-Xcc","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-Xcc","-fPIC","-Xcc","-g","-package-name","llama"]
+
+  "C.LibLlmaTest-arm64-apple-macosx15.0-debug.module":
+    tool: shell
+    inputs: ["/Users/ramesh/Documents/projects/examples/llama/Tests/LibLlmaTests/LibLlmaTests.swift","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules/LibLlma.swiftmodule","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/llama.framework/","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlmaTest.build/sources"]
+    outputs: ["/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlmaTest.build/LibLlmaTests.swift.o","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules/LibLlmaTest.swiftmodule"]
+    description: "Compiling Swift Module 'LibLlmaTest' (1 sources)"
+    args: ["/Library/Developer/CommandLineTools/usr/bin/swiftc","-module-name","LibLlmaTest","-emit-dependencies","-emit-module","-emit-module-path","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules/LibLlmaTest.swiftmodule","-output-file-map","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlmaTest.build/output-file-map.json","-parse-as-library","-incremental","-c","@/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlmaTest.build/sources","-I","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/Modules","-target","arm64-apple-macosx10.13","-enable-batch-mode","-index-store-path","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/index/store","-Onone","-enable-testing","-j10","-DSWIFT_PACKAGE","-DDEBUG","-I","/Users/ramesh/Documents/projects/examples/llama/Sources/library/llama.xcframework/macos-arm64_x86_64","-Xcc","-I","-Xcc","/Users/ramesh/Documents/projects/examples/llama/Sources/library/llama.xcframework/macos-arm64_x86_64","-module-cache-path","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/ModuleCache","-parseable-output","-parse-as-library","-F","/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug","-color-diagnostics","-swift-version","6","-F","/Library/Developer/CommandLineTools/Library/Developer/Frameworks","-sdk","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-g","-Xcc","-isysroot","-Xcc","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-Xcc","-fPIC","-Xcc","-g","-package-name","llama"]
+
+  "PackageStructure":
+    tool: package-structure-tool
+    inputs: ["/Users/ramesh/Documents/projects/examples/llama/Sources/LibLlma/","/Users/ramesh/Documents/projects/examples/llama/Sources/library/llama.xcframework/","/Users/ramesh/Documents/projects/examples/llama/Tests/","/Users/ramesh/Documents/projects/examples/llama/Package.swift","/Users/ramesh/Documents/projects/examples/llama/Package.resolved"]
+    outputs: ["<PackageStructure>"]
+    description: "Planning build"
+    allow-missing-inputs: true
+

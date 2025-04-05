@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/master.swiftdeps"
+  },
+  "/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.derived/runner.swift": {
+    "dependencies": "/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/runner.d",
+    "object": "/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/runner.swift.o",
+    "swiftmodule": "/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/runner~partial.swiftmodule",
+    "swift-dependencies": "/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/runner.swiftdeps"
+  }
+}

@@ -1,0 +1,4 @@
+module LibLlma {
+    header "/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlma.build/LibLlma-Swift.h"
+    requires objc
+}
