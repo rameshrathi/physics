@@ -2,30 +2,27 @@
 import PackageDescription
 
 let package = Package(
-	name: "LibLlama",
+	name: "runner",
 	products:[
 		.library(
-			name: "LibLlma",
-			targets: ["LibLlma"]
+			name: "runner",
+			targets: ["llama"]
 		),
 	],
 	targets: [
 		.binaryTarget(
 			name: "llama",
-			path: "Sources/library/llama.xcframework"
-		),
-		.target(
-			name: "LibLlma",
-			dependencies: ["llama"]
+			path: "runner/library/llama.xcframework"
 		),
 		.testTarget(
-			name: "LibLlmaTest",
-			dependencies: ["LibLlma"]
+			name: "Tests",
+			dependencies: ["llama"],
+			path: "runner/tests"
 		),
 		.executableTarget(
 			name: "Run",
 			dependencies: ["llama"],
-			path: "lib"
+			path: "runner/run"
 		)
 	]
 )

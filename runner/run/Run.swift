@@ -173,4 +173,13 @@ class LlamaSession {
 	}
 }
 
-// --- End of Hypothetical Wrapper ---
+//-------------------------------
+// ----------- Run --------------
+//-------------------------------
+@main
+public struct Run {
+
+	public static func main() {
+		print("Running the run \n")
+	}
+}
