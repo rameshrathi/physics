@@ -14,5 +14,7 @@
         "stat.h": "c",
         "fcntl.h": "c",
         "_default_fcntl.h": "c"
-    }
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/arm-none-eabi-gcc",
+    "C_Cpp.intelliSenseEngine": "default"
 }

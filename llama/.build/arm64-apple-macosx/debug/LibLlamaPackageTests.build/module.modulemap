@@ -1,4 +1,0 @@
-module LibLlamaPackageTests {
-    header "/Users/ramesh/Documents/projects/examples/llama/.build/arm64-apple-macosx/debug/LibLlamaPackageTests.build/LibLlamaPackageTests-Swift.h"
-    requires objc
-}

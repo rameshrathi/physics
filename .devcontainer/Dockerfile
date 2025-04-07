@@ -23,11 +23,6 @@ RUN curl -Lo arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-eabi.tar.xz "https://a
   && rm arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-eabi.tar.xz \
   && ln -s /opt/arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-eabi/bin/* /usr/local/bin/
 
-# Install Node.js (includes npm)
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g npm
-
 # Install Python toolchain
 RUN apt-get install -y \
     python3 \
