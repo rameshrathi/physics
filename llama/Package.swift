@@ -21,6 +21,10 @@ let package = Package(
 		.testTarget(
 			name: "LibLlmaTest",
 			dependencies: ["LibLlma"]
+		),
+		.executableTarget(
+			name: "Run",
+			path: "lib"
 		)
 	]
 )

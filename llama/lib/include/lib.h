@@ -10,4 +10,7 @@
 #include "memory.h"
 #include "convert.h"
 
+
+int compress_string( char *s );
+
 #endif
