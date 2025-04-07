@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include "lib/scheduler.h"
+#include "scheduler/scheduler.h"
 
 // Task 1: simple infinite loop with void* argument (unused here)
 void task1(void *arg) {

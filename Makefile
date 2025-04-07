@@ -13,7 +13,7 @@ BUILD_DIR = build
 TARGET = scheduler
 
 # Source files
-SOURCES = main.c lib/scheduler.c lib/startup.c
+SOURCES = main.c src/scheduler/scheduler.c src/scheduler/startup.c
 
 # Object files
 OBJECTS = $(patsubst %.c, $(BUILD_DIR)/%.o, $(SOURCES))
