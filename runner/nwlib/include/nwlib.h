@@ -3,7 +3,7 @@
 #ifndef nwlib_h
 #define nwlib_h
 
-void nw_start_capture();
+void nw_start_process();
 
 #endif
 

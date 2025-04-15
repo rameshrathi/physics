@@ -1,10 +1,20 @@
+#include "buffer_mgr.h"
+#include "http_client.h"
+#include "thread_mgr.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include "include/nwlib.h"
 
-void nw_start_capture()
+// Startup of the process
+void nw_start_process()
 {
+    // init buffer
+    initialize_buffers();
     
-    printf("Starting nw capture...");
+    // start threads
+    create_threads(thread_function, 10);
     
+    // Keep the clients running
+    while (1);
 }

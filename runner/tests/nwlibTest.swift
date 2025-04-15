@@ -7,6 +7,6 @@ import runner
 struct NwLibTests {
     @Test func test_capture() async throws {
         
-        nw_start_capture()
+        nw_start_process()
     }
 }
