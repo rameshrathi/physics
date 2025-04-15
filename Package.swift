@@ -3,26 +3,20 @@ import PackageDescription
 
 let package = Package(
 	name: "runner",
-	products:[
-		.library(
-			name: "runner",
-			targets: ["llama"]
-		),
-	],
 	targets: [
-		.binaryTarget(
-			name: "llama",
-			path: "runner/library/llama.xcframework"
-		),
-		.testTarget(
-			name: "Tests",
-			dependencies: ["llama"],
-			path: "runner/tests"
-		),
-		.executableTarget(
-			name: "Run",
-			dependencies: ["llama"],
+        .target(
+            name: "nwlib",
+            path: "runner/nwlib"
+        ),
+		.target(
+			name: "runner",
+			dependencies: ["nwlib"],
 			path: "runner/run"
-		)
+		),
+        .testTarget(
+            name: "Tests",
+            dependencies: ["nwlib"],
+            path: "runner/tests"
+        ),
 	]
 )
