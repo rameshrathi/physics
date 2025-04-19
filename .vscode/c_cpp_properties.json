@@ -3,7 +3,7 @@
         {
             "name": "ARM Cortex-M33",
             "includePath": [
-                "${workspaceFolder}/lib",
+                "${workspaceFolder}/workspace/lib",
                 "/usr/arm-none-eabi/include"
             ],
             "defines": [],

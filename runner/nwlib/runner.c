@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <unistd.h>
+#include <poll.h>
+#include <sys/pipe.h>
 
 // Startup of the process
 void nw_start_process()
@@ -17,4 +19,12 @@ void nw_start_process()
     
     // Keep the clients running
     while (1);
+}
+
+int start_main(int agrc, char *argv[])
+{
+    int fd_input = stdin;
+    int fd_output = stdout;
+    
+    
 }

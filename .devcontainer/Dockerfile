@@ -23,23 +23,5 @@ RUN curl -Lo arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-eabi.tar.xz "https://a
   && rm arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-eabi.tar.xz \
   && ln -s /opt/arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-eabi/bin/* /usr/local/bin/
 
-# Install Python toolchain
-RUN apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-dev \
-    && ln -s /usr/bin/python3 /usr/bin/python \
-    && pip3 install --upgrade pip
-
-# Install additional tools for IntelliSense and development
-RUN apt-get install -y \
-    clang \
-    clang-format \
-    clang-tidy \
-    && pip3 install pylint
-
-# Set up working directory
-WORKDIR /workspace
-
 # Ensure PATH includes ARM tools
 ENV PATH="/usr/local/bin:${PATH}"

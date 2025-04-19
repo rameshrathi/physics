@@ -5,6 +5,8 @@
 
 void nw_start_process();
 
+int start_main(int agrc, char *argv[]);
+
 #endif
 
 

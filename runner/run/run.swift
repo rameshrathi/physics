@@ -1,4 +1,5 @@
 import Foundation
+import nwlib
 
 //-------------------------------
 // ----------- Run --------------
@@ -8,6 +9,9 @@ import Foundation
 public struct Run {
 
 	public static func main() {
-		print("Running the run \n")
+		start_main(
+            CommandLine.argc,
+            CommandLine.unsafeArgv
+        )
 	}
 }

@@ -18,6 +18,9 @@ void create_threads(ThreadFunction func, int thread_count) {
             exit(EXIT_FAILURE);
         }
     }
+    pthread_cond_t cond1;
+    pthread_condattr_t attr;
+    pthread_condattr_init(&attr);
 
     for (int i = 0; i < thread_count; i++) {
         pthread_join(threads[i], NULL);

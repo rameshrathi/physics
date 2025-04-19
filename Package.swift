@@ -8,7 +8,7 @@ let package = Package(
             name: "nwlib",
             path: "runner/nwlib"
         ),
-		.target(
+		.executableTarget(
 			name: "runner",
 			dependencies: ["nwlib"],
 			path: "runner/run"
