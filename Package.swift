@@ -6,17 +6,17 @@ let package = Package(
 	targets: [
         .target(
             name: "nwlib",
-            path: "runner/nwlib"
+            path: "nwlib/lib"
         ),
 		.executableTarget(
 			name: "runner",
 			dependencies: ["nwlib"],
-			path: "runner/run"
+			path: "nwlib/run"
 		),
         .testTarget(
-            name: "Tests",
+            name: "tests",
             dependencies: ["nwlib"],
-            path: "runner/tests"
+            path: "nwlib/tests"
         ),
 	]
 )
