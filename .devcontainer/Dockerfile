@@ -17,11 +17,5 @@ RUN apt-get update && apt-get install -y \
     xz-utils \
     && apt-get clean
 
-# Install ARM GCC Toolchain for 32-bit ARM (Cortex-M, Cortex-R)
-RUN curl -Lo arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-eabi.tar.xz "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-eabi.tar.xz" \
-  && tar -xJf arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-eabi.tar.xz -C /opt \
-  && rm arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-eabi.tar.xz \
-  && ln -s /opt/arm-gnu-toolchain-12.2.rel1-aarch64-arm-none-eabi/bin/* /usr/local/bin/
-
 # Ensure PATH includes ARM tools
 ENV PATH="/usr/local/bin:${PATH}"
