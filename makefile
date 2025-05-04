@@ -8,8 +8,8 @@ CXXFLAGS = -std=c++17 -Wall -Wpedantic -Wextra
 # Directories
 SRC_DIR = src
 LIB_DIR = $(SRC_DIR)/lib
-OBJ_DIR = obj
-BIN_DIR = bin
+OBJ_DIR = .bin/obj
+BIN_DIR = .bin
 
 # Output executable name
 EXEC = service_manager
