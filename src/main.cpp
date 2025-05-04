@@ -408,7 +408,7 @@ int main(int argc, char *argv[]) {
     std::cout << "Starting Docker Service Manager..." << std::endl;
     
     // Initialize any required services
-    initialize_buffers();
+    // initialize_buffers();
     
     int choice;
     bool exit = false;
