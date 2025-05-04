@@ -9,20 +9,21 @@
 #include <thread>      // For sleep and thread management
 #include <chrono>      // For time handling
 #include <iomanip>     // For output formatting
-#include "lib/chat.hpp" // For chat service
+
+#include "lib/include/lib.h"
 
 // --- Service Definition ---
 // Structure to define a manageable service (likely a Docker container)
 struct ServiceDefinition {
-    std::string id;                 // Unique identifier for the service (used for container naming)
-    std::string name;               // User-friendly name
-    std::string description;        // Description of the service
-    std::string dockerImage;        // Docker image to use (e.g., "ubuntu:latest", "ollama/ollama")
-    std::vector<std::string> ports; // Port mappings (e.g., "8080:80")
-    std::vector<std::string> volumes; // Volume mounts (e.g., "/host/path:/container/path")
-    std::map<std::string, std::string> environment; // Environment variables
-    std::string command;            // Optional command to run inside the container
-    bool isLLM = false;             // Flag to identify if this is an LLM service
+    std::string id;
+    std::string name;
+    std::string description;
+    std::string dockerImage;
+    std::vector<std::string> ports;
+    std::vector<std::string> volumes; 
+    std::map<std::string, std::string> environment;
+    std::string command;
+    bool isLLM = false;
 };
 
 // --- Placeholder for actual service definitions ---

@@ -7,3 +7,5 @@ dist/
 .bin
 .o
 .swiftpm
+bin
+obj
