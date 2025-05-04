@@ -115,7 +115,7 @@ unsigned int ChatService::get_port() const {
 
 // Get the client count
 unsigned int ChatService::get_client_count() const {
-    std::lock_guard<std::mutex> lock(clients_mutex);
+    // std::unique_lock<std::mutex> lock(clients_mutex);
     return clients.size();
 }
 
