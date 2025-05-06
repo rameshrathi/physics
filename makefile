@@ -11,6 +11,17 @@ LIB_DIR = $(SRC_DIR)/lib
 OBJ_DIR = .bin/obj
 BIN_DIR = .bin
 
+BOOST_INCLUDE = /usr/include
+OPENSSL_INCLUDE = /usr/include
+BOOST_LIB = /usr/lib/x86_64-linux-gnu
+OPENSSL_LIB = /usr/lib/x86_64-linux-gnu
+
+# Linker flags and libraries
+LDFLAGS = -L$(BOOST_LIB) -L$(OPENSSL_LIB)
+# Libraries needed: boost_system, boost_thread, boost_chrono, boost_regex, boost_atomic, ssl, crypto, pthread
+LIBS = -lboost_system -lboost_thread -lboost_chrono -lboost_regex -lboost_atomic -lssl -lcrypto -lpthread
+
+
 # Output executable name
 EXEC = service_manager
 
@@ -58,12 +69,12 @@ $(EXECUTABLE): $(OBJ_FILES)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@echo "Compiling $<..."
 	@$(MKDIR) $(dir $@)
-	@$(CC) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+	@$(CC) $(CXXFLAGS) $(INCLUDES) -I$(BOOST_INCLUDE) -I$(OPENSSL_INCLUDE) -c $< -o $@
 
 # Clean build files
 clean:
 	@echo "Cleaning build files..."
-	@$(RM) $(OBJ_DIR)/*.o $(EXECUTABLE)
+	@$(RM) $(OBJ_DIR)/*.o $(EXECUTABLE) -rf $(BIN_DIR)
 	@echo "Clean complete"
 
 # Run the service manager

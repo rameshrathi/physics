@@ -345,8 +345,3 @@ void ChatService::handle_menu_choice() {
             std::cerr << "Invalid choice. Please try again." << std::endl;
     }
 }
-
-// Function to add chat service to the main menu
-void add_chat_service_to_menu() {
-    // This function will be implemented in main.cpp
-}
