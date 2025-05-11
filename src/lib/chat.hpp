@@ -19,7 +19,7 @@ class ChatService {
 private:
     int server_socket;
     unsigned int port;
-    std::string auth_token;  // Token for authentication
+    std::string auth_token;
     std::atomic<bool> running;
     std::thread server_thread;
     std::mutex clients_mutex;

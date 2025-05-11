@@ -3,7 +3,7 @@
 
 # Compiler and flags
 CC = g++
-CXXFLAGS = -std=c++17 -Wall -Wpedantic -Wextra
+CXX_FLAGS = -std=c++17 -Wall -Wpedantic -Wextra
 
 # Directories
 SRC_DIR = src
@@ -69,13 +69,13 @@ $(EXECUTABLE): $(OBJ_FILES)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@echo "Compiling $<..."
 	@$(MKDIR) $(dir $@)
-	@$(CC) $(CXXFLAGS) $(INCLUDES) -I$(BOOST_INCLUDE) -I$(OPENSSL_INCLUDE) -c $< -o $@
+	@$(CC) $(CXX_FLAGS) $(INCLUDES) -I$(BOOST_INCLUDE) -I$(OPENSSL_INCLUDE) -c $< -o $@
 
 # Clean build files
 clean:
 	@echo "Cleaning build files..."
 	@$(RM) $(OBJ_DIR)/*.o $(EXECUTABLE) -rf $(BIN_DIR)
-	@echo "Clean complete"
+	@echo "Clean complete
 
 # Run the service manager
 run: $(EXECUTABLE)
