@@ -6,6 +6,7 @@ CC = g++
 CXX_FLAGS = -std=c++17 -Wall -Wpedantic -Wextra
 
 # Directories
+RK_DIR = RK
 SRC_DIR = src
 LIB_DIR = $(SRC_DIR)/lib
 OBJ_DIR = .bin/obj
@@ -21,6 +22,11 @@ LDFLAGS = -L$(BOOST_LIB) -L$(OPENSSL_LIB)
 # Libraries needed: boost_system, boost_thread, boost_chrono, boost_regex, boost_atomic, ssl, crypto, pthread
 LIBS = -lboost_system -lboost_thread -lboost_chrono -lboost_regex -lboost_atomic -lssl -lcrypto -lpthread
 
+# Library
+LIB_NAME = RKLib
+STATIC_LIB = $(LIB_DIR)/lib$(LIB_NAME).a
+AK_SRCS = $(wildcard $(AK_DIR)/*.cpp)
+AK_OBJS = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(notdir $(AK_SRCS)))
 
 # Output executable name
 EXEC = service_manager
@@ -49,6 +55,11 @@ else
     EXE_EXT =
 endif
 
+# Build static library
+$(STATIC_LIB): $(RK_OBJS)
+	@mkdir -p $(LIB_DIR)
+	ar rcs $@ $^
+
 # Define the executable with platform-specific extension
 EXECUTABLE = $(BIN_DIR)/$(EXEC)$(EXE_EXT)
 
@@ -60,7 +71,7 @@ directories:
 	@$(MKDIR) $(BIN_DIR) $(OBJ_DIR) $(OBJ_DIR)/lib
 
 # Link the executable
-$(EXECUTABLE): $(OBJ_FILES)
+$(EXECUTABLE): $(OBJ_FILES) $(STATIC_LIB)
 	@echo "Linking $@..."
 	@$(CC) $^ -o $@ $(LDFLAGS)
 	@echo "Build complete: $@"
@@ -75,7 +86,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 clean:
 	@echo "Cleaning build files..."
 	@$(RM) $(OBJ_DIR)/*.o $(EXECUTABLE) -rf $(BIN_DIR)
-	@echo "Clean complete
+	@echo "Clean complete"
 
 # Run the service manager
 run: $(EXECUTABLE)

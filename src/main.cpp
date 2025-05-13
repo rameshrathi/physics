@@ -1,5 +1,4 @@
 #include <iostream>
-using namespace std;
 
 // calculating factorial at compile-time
 template <int N> struct Factorial
@@ -17,6 +16,6 @@ int main()
 {
     // Factorial computation
     // happens at compile-time
-    cout << "Factorial of 5 is: " << Factorial<5>::value;
+    std::cout << "Factorial of 5 is: " << Factorial<5>::value;
     return 0;
 }
