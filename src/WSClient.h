@@ -28,7 +28,7 @@ inline void fail(const beast::error_code & ec, char const* what)
 using JsonResponseCallback = std::function<void(beast::error_code, const json::value&)>;
 
 // Represents a single WebSocket client connection
-class WebsocketClient : public std::enable_shared_from_this<WebsocketClient>
+class WSClient : public std::enable_shared_from_this<WSClient>
 {
     ip::tcp::resolver resolver_;
     websocket::stream<beast::tcp_stream> ws_;
@@ -41,14 +41,14 @@ class WebsocketClient : public std::enable_shared_from_this<WebsocketClient>
 public:
     // Constructor
     explicit
-    WebsocketClient(asio::io_context& ioc)
+    WSClient(asio::io_context& ioc)
         : resolver_(ioc)
         , ws_(ioc)
     {
     }
 
     // Destructor (closes the WebSocket connection)
-    ~WebsocketClient()
+    ~WSClient()
     {
         // Attempt to close the connection gracefully
         if (ws_.is_open())
@@ -63,10 +63,10 @@ public:
     }
 
     // Stopping copy/move
-    WebsocketClient(WebsocketClient const&) = delete;
-    WebsocketClient(WebsocketClient&&) = delete;
-    WebsocketClient& operator=(WebsocketClient const&) = delete;
-    WebsocketClient& operator=(WebsocketClient&&) = delete;
+    WSClient(WSClient const&) = delete;
+    WSClient(WSClient&&) = delete;
+    WSClient& operator=(WSClient const&) = delete;
+    WSClient& operator=(WSClient&&) = delete;
 
     // Start the asynchronous operation to connect
     void

@@ -1,12 +1,11 @@
 #include <boost/beast/core.hpp>
-#include <boost/beast/websocket.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/json.hpp>
 #include <iostream>
 #include <memory>
 #include <string>
 
-#include "WebsocketClient.h"
+#include "WSClient.h"
 
 namespace beast = boost::beast;
 namespace http = beast::http;
@@ -22,8 +21,8 @@ int main()
     asio::io_context ioc;
 
     // Create multiple clients for different endpoints
-    auto client1 = std::make_shared<WebsocketClient>(ioc);
-    auto client2 = std::make_shared<WebsocketClient>(ioc);
+    auto client1 = std::make_shared<WSClient>(ioc);
+    auto client2 = std::make_shared<WSClient>(ioc);
 
     // Connect client1 to an echo server (replace with your actual endpoint)
     client1->connect(
@@ -50,9 +49,6 @@ int main()
         });
 
     // Connect client2 to another endpoint (replace with your actual endpoint)
-    // Note: echo.websocket.org is a simple echo server, it doesn't process JSON specifically,
-    // but this demonstrates connecting to a different endpoint.
-    // For a real application, you'd connect client2 to a different server/path
      client2->connect(
         "echo.websocket.org", // Host
         "80",                 // Port
@@ -77,9 +73,6 @@ int main()
 
 
     // Give some time for connections to establish before sending
-    // In a real application, you'd send messages after the handshake is complete
-    // (e.g., from the on_handshake handler or a separate 'connected' state).
-    // For this example, we'll use a timer for demonstration.
     asio::steady_timer timer(ioc, std::chrono::seconds(2));
     timer.async_wait([&](const beast::error_code& ec) {
         if (!ec) {
@@ -88,7 +81,7 @@ int main()
             client1->send(msg1);
 
              // Send a JSON message from client2
-            json::value msg2 = {{"type", "request"}, {"data", 123}};
+            const json::value msg2 = {{"type", "request"}, {"data", 123}};
             client2->send(msg2);
         } else {
              std::cerr << "Timer error: " << ec.message() << std::endl;

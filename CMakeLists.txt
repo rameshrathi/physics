@@ -18,7 +18,7 @@ find_package(Threads REQUIRED)
 
 add_executable(trade_simulator
         src/main.cpp
-        src/WebsocketClient.cpp
+        src/WSClient.cpp
 )
 
 target_include_directories(trade_simulator PRIVATE

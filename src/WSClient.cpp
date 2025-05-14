@@ -6,11 +6,11 @@
 #include <boost/beast/websocket/stream.hpp>
 #include <boost/json.hpp>
 
-#include "WebsocketClient.h"
+#include "WSClient.h"
 
 // Start the asynchronous operation to connect
 void
-WebsocketClient::connect(
+WSClient::connect(
     const std::string& host,
     const std::string& port,
     const std::string& target,
@@ -26,13 +26,13 @@ WebsocketClient::connect(
         host_,
         port_,
         beast::bind_front_handler(
-            &WebsocketClient::on_resolve,
+            &WSClient::on_resolve,
             shared_from_this())); // Use shared_from_this for handler lifetime
 }
 
 // Send a JSON value as a WebSocket text message
 void
-WebsocketClient::send(const json::value& msg)
+WSClient::send(const json::value& msg)
 {
     // Serialize the JSON value to a string
     std::string ss = json::serialize(msg);
@@ -41,13 +41,13 @@ WebsocketClient::send(const json::value& msg)
     ws_.async_write(
         asio::buffer(ss),
         beast::bind_front_handler(
-            &WebsocketClient::on_write,
+            &WSClient::on_write,
             shared_from_this())); // Use shared_from_this for handler lifetime
 }
 
 // Handler for the resolve operation
 void
-WebsocketClient::on_resolve(
+WSClient::on_resolve(
     beast::error_code ec,
     const ip::tcp::resolver::results_type& results)
 {
@@ -61,13 +61,13 @@ WebsocketClient::on_resolve(
     beast::get_lowest_layer(ws_).async_connect(
         results,
         beast::bind_front_handler(
-            &WebsocketClient::on_connect,
+            &WSClient::on_connect,
             shared_from_this())); // Use shared_from_this for handler lifetime
 }
 
 // Handler for the connect operation
 void
-WebsocketClient::on_connect(beast::error_code ec, ip::tcp::resolver::results_type::endpoint_type)
+WSClient::on_connect(beast::error_code ec, ip::tcp::resolver::results_type::endpoint_type)
 {
     if(ec)
         return fail(ec, "connect");
@@ -77,13 +77,13 @@ WebsocketClient::on_connect(beast::error_code ec, ip::tcp::resolver::results_typ
         host_,
         target_,
         beast::bind_front_handler(
-            &WebsocketClient::on_handshake,
+            &WSClient::on_handshake,
             shared_from_this())); // Use shared_from_this for handler lifetime
 }
 
 // Handler for the handshake operation
 void
-WebsocketClient::on_handshake(beast::error_code ec)
+WSClient::on_handshake(beast::error_code ec)
 {
     if(ec)
         return fail(ec, "handshake");
@@ -94,19 +94,19 @@ WebsocketClient::on_handshake(beast::error_code ec)
 
 // Start an asynchronous read operation
 void
-WebsocketClient::do_read()
+WSClient::do_read()
 {
     // Read a message into our buffer
     ws_.async_read(
         buffer_,
         beast::bind_front_handler(
-            &WebsocketClient::on_read,
+            &WSClient::on_read,
             shared_from_this())); // Use shared_from_this for handler lifetime
 }
 
 // Handler for the read operation
 void
-WebsocketClient::on_read(
+WSClient::on_read(
     beast::error_code ec,
     std::size_t bytes_transferred)
 {
@@ -175,7 +175,7 @@ WebsocketClient::on_read(
 
 // Handler for the write operation
 void
-WebsocketClient::on_write(
+WSClient::on_write(
     beast::error_code ec,
     std::size_t bytes_transferred)
 {
