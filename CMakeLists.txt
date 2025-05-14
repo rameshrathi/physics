@@ -27,13 +27,13 @@ target_include_directories(trade_simulator PRIVATE
 )
 
 target_link_libraries(trade_simulator PRIVATE
-        Boost::system
-        Boost::json
-        Boost::beast
-        Boost::thread
-        Boost::filesystem
-        OpenSSL::SSL
-        OpenSSL::Crypto
-        Threads::Threads
+    Boost::system
+    Boost::json
+    Boost::thread
+    Boost::filesystem
+    ${Boost_LIBRARIES}
+    OpenSSL::SSL
+    OpenSSL::Crypto
+    Threads::Threads
 )
 
