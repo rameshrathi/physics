@@ -11,7 +11,7 @@ endif()
 # Boost
 set(BOOST_ROOT "${CMAKE_SOURCE_DIR}/external/boost")
 set(BOOST_INCLUDEDIR "${BOOST_ROOT}/include")
-set(BOOST_LIBRARYDIR "${BOOST_ROOT}/stage/lib")  # if you build libs there
+set(BOOST_LIBRARYDIR "${BOOST_ROOT}/stage/lib")
 
 find_package(Boost REQUIRED
         COMPONENTS system thread filesystem chrono date_time atomic regex
@@ -28,7 +28,6 @@ add_executable(trade_simulator
 )
 
 target_include_directories(trade_simulator PRIVATE
-        ${CMAKE_SOURCE_DIR}/external/json
         ${Boost_INCLUDE_DIRS}
         ${OPENSSL_INCLUDE_DIR}
 )

@@ -2,7 +2,6 @@
 
 set -e
 
-# Script to download external dependencies
 EXTERNAL_DIR="./external"
 
 # Boost settings
@@ -12,12 +11,6 @@ BOOST_FILENAME="boost_${BOOST_VERSION//./_}"
 BOOST_ARCHIVE="${BOOST_FILENAME}.tar.gz"
 BOOST_URL="https://archives.boost.io/release/${BOOST_VERSION}/source/${BOOST_ARCHIVE}"
 
-# JSON settings
-JSON_DIR="${EXTERNAL_DIR}/json"
-JSON_VERSION="v3.11.2"
-JSON_URL="https://github.com/nlohmann/json/releases/download/${JSON_VERSION}/json.hpp"
-
-# FTXUI settings
 FTXUI_DIR="${EXTERNAL_DIR}/ftxui"
 FTXUI_REPO="https://github.com/ArthurSonzogni/FTXUI.git"
 
@@ -59,19 +52,6 @@ if [ ! -d "${BOOST_DIR}" ]; then
     echo "Boost ${BOOST_VERSION} downloaded and extracted to ${BOOST_DIR}"
 else
     echo "Boost already exists at ${BOOST_DIR}, Installing it"
-fi
-
-# Download nlohmann/json if it doesn't exist
-echo "Checking for nlohmann/json at ${JSON_DIR}..."
-if [ ! -d "${JSON_DIR}" ]; then
-    echo "nlohmann/json not found. Downloading..."
-
-    mkdir -p "${JSON_DIR}"
-    echo "  -> Downloading from ${JSON_URL}"
-    curl -fSL "${JSON_URL}" -o "${JSON_DIR}/json.hpp"
-    echo "nlohmann/json has been downloaded to ${JSON_DIR}"
-else
-    echo "nlohmann/json directory already exists at ${JSON_DIR}"
 fi
 
 # Download FTXUI if it doesn't exist
