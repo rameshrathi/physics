@@ -3,189 +3,161 @@
 //
 
 #include <boost/beast/core.hpp>
-#include <boost/beast/websocket/stream.hpp>
-#include <boost/json.hpp>
-
+#include <boost/beast/websocket.hpp>
+#include <boost/asio.hpp>
+#include <boost/asio/ssl/stream.hpp>
+#include <boost/asio/connect.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <iostream>
 #include "WSClient.h"
 
-// Start the asynchronous operation to connect
-void
-WSClient::connect(
-    const std::string& host,
+namespace  json = boost::json;
+
+WSClient::WSClient(net::io_context& ioc, ssl::context& ctx)
+    : resolver_(net::make_strand(ioc)),
+    ws_(net::make_strand(ioc), ctx)
+    {}
+
+void WSClient::connect(
+    const std::string& url,
     const std::string& port,
-    const std::string& target,
-    JsonResponseCallback callback)
-{
-    host_ = host;
-    port_ = port;
-    target_ = target;
-    callback_ = std::move(callback);
-
-    // Look up the domain name
-    resolver_.async_resolve(
-        host_,
-        port_,
-        beast::bind_front_handler(
-            &WSClient::on_resolve,
-            shared_from_this())); // Use shared_from_this for handler lifetime
+    int max_retries,
+    std::chrono::milliseconds retry_delay
+) {
+    host_ = url;
+    max_connect_retries_ = max_retries;
+    connect_delay_ = retry_delay;
+    connect_retries_ = 0;
+    do_resolve();
 }
 
-// Send a JSON value as a WebSocket text message
-void
-WSClient::send(const json::value& msg)
-{
-    // Serialize the JSON value to a string
-    std::string ss = json::serialize(msg);
-
-    // Write the string asynchronously
-    ws_.async_write(
-        asio::buffer(ss),
-        beast::bind_front_handler(
-            &WSClient::on_write,
-            shared_from_this())); // Use shared_from_this for handler lifetime
+void WSClient::do_resolve() {
+    resolver_.async_resolve(host_, ":" + ws_.next_layer().next_layer().remote_endpoint().port(),
+        beast::bind_front_handler(&WSClient::on_resolve, shared_from_this())
+        );
 }
 
-// Handler for the resolve operation
-void
-WSClient::on_resolve(
-    beast::error_code ec,
-    const ip::tcp::resolver::results_type& results)
-{
-    if(ec)
+void WSClient::on_resolve(beast::error_code ec, tcp::resolver::results_type results) {
+    if (ec) {
+        if (connect_retries_++ < max_connect_retries_) {
+            std::this_thread::sleep_for(connect_delay_);
+            do_resolve();
+            return;
+        }
         return fail(ec, "resolve");
-
-    // Set a timeout for the operation
-    beast::get_lowest_layer(ws_).expires_after(std::chrono::seconds(30));
-
-    // Make the connection on the IP address we get from a lookup
-    beast::get_lowest_layer(ws_).async_connect(
+    }
+    net::async_connect(
+        ws_.next_layer().next_layer(),
         results,
-        beast::bind_front_handler(
-            &WSClient::on_connect,
-            shared_from_this())); // Use shared_from_this for handler lifetime
+        beast::bind_front_handler(&WSClient::on_connect, shared_from_this())
+        );
 }
 
-// Handler for the connect operation
-void
-WSClient::on_connect(beast::error_code ec, ip::tcp::resolver::results_type::endpoint_type)
-{
-    if(ec)
+void WSClient::on_connect(beast::error_code ec, tcp::resolver::results_type::endpoint_type) {
+    if (ec) {
+        if (connect_retries_++ < max_connect_retries_) {
+            std::this_thread::sleep_for(connect_delay_);
+            do_resolve();
+            return;
+        }
         return fail(ec, "connect");
-
-    // Perform the websocket handshake
-    ws_.async_handshake(
-        host_,
-        target_,
-        beast::bind_front_handler(
-            &WSClient::on_handshake,
-            shared_from_this())); // Use shared_from_this for handler lifetime
+    }
+    ws_.next_layer().async_handshake(
+        ssl::stream_base::client,
+        beast::bind_front_handler(&WSClient::on_ssl_handshake, shared_from_this()));
 }
 
-// Handler for the handshake operation
-void
-WSClient::on_handshake(beast::error_code ec)
-{
-    if(ec)
-        return fail(ec, "handshake");
-
-    // Handshake is complete, start reading messages
-    do_read();
+void WSClient::on_ssl_handshake(beast::error_code ec) {
+    if (ec) return fail(ec, "ssl_handshake");
+    ws_.async_handshake(host_, "/",
+        beast::bind_front_handler(&WSClient::on_ws_handshake, shared_from_this())
+        );
 }
 
-// Start an asynchronous read operation
-void
-WSClient::do_read()
-{
-    // Read a message into our buffer
-    ws_.async_read(
-        buffer_,
-        beast::bind_front_handler(
-            &WSClient::on_read,
-            shared_from_this())); // Use shared_from_this for handler lifetime
+void WSClient::on_ws_handshake(beast::error_code ec) {
+    if (ec) return fail(ec, "websocket_handshake");
+    if (on_connected_) on_connected_();
+    ws_.async_read(buffer_,
+        beast::bind_front_handler(&WSClient::on_read, shared_from_this())
+        );
 }
 
-// Handler for the read operation
-void
-WSClient::on_read(
-    beast::error_code ec,
-    std::size_t bytes_transferred)
+void WSClient::send(
+    const std::string& message,
+    const int max_retries,
+    std::chrono::milliseconds retry_delay)
 {
-    boost::ignore_unused(bytes_transferred);
+    max_send_retries_ = max_retries;
+    send_delay_ = retry_delay;
+    send_retries_ = 0;
+    ws_.async_write(
+        net::buffer(message),
+        beast::bind_front_handler(&WSClient::on_write, shared_from_this())
+        );
+}
 
-    if(ec == websocket::error::closed)
-        return; // Connection was closed gracefully
+void WSClient::on_write(beast::error_code ec, std::size_t) {
+    if (ec) {
+        if (send_retries_++ < max_send_retries_) {
+            std::this_thread::sleep_for(send_delay_);
+            ws_.async_write(
+                net::buffer(buffer_.data()),
+                beast::bind_front_handler(&WSClient::on_write, shared_from_this())
+                );
+            return;
+        }
+        return fail(ec, "write");
+    }
+    buffer_.consume(buffer_.size());
+        ws_.async_read(buffer_,
+        beast::bind_front_handler(&WSClient::on_read, shared_from_this())
+        );
+}
 
-    if(ec)
+void WSClient::on_read(beast::error_code ec, std::size_t) {
+    if (ec)
         return fail(ec, "read");
 
-    // Check if the received message is text and complete
-    if (ws_.got_text() && ws_.is_message_done())
-    {
-        // Get the received message payload
-        beast::string_view received_payload = beast::buffers_to_string(buffer_.data());
+    std::string raw = beast::buffers_to_string(buffer_.data());
+    if (on_message_)
+        on_message_(raw);
 
-        try
-        {
-            // Parse the received JSON string
-            json::value received_json = json::parse(received_payload);
-
-            // Invoke the user-provided callback with the parsed JSON
-            if (callback_)
-            {
-                callback_(beast::error_code{}, received_json);
-            }
+    // Attempt parsing if parser provided
+    if (json_parser_ && on_parsed_) {
+        try {
+            // Cast back to actual parser
+            const std::shared_ptr<JSONParser> parser = std::static_pointer_cast<JSONParser>(json_parser_);
+            const json::value parsed = parser->parse(raw);
+            on_parsed_(raw, parsed);
         }
-        catch (const beast::system_error & e)
-        {
-            // Handle JSON parsing errors
-            std::cerr << "JSON parse error: " << e.what() << std::endl;
-            // Optionally, report this error via the callback
-             if (callback_)
-            {
-                callback_(e.code(), json::value()); // Pass the JSON error code
-            }
-        }
-        catch (const std::exception& e)
-        {
-            // Handle other potential errors during processing
-            std::cerr << "Processing error: " << e.what() << std::endl;
-             if (callback_)
-            {
-                // Create a generic error code or use a specific one if available
-                beast::error_code processing_ec(static_cast<int>(asio::error::operation_aborted), asio::error::get_system_category());
-                callback_(processing_ec, json::value());
-            }
+        catch (const std::exception& ex) {
+            fail(beast::error_code{}, ex.what());
         }
     }
-    else
-    {
-        // Handle non-text messages or fragmented messages if needed
-        std::cerr << "Received non-text or fragmented message." << std::endl;
-        // Depending on requirements, you might ignore, log, or handle differently.
-        // For this example, we'll just log and continue reading.
-    }
-
-
-    // Clear the buffer for the next read
     buffer_.consume(buffer_.size());
-
-    // Continue reading messages
-    do_read();
+    ws_.async_read(buffer_,
+    beast::bind_front_handler(&WSClient::on_read, shared_from_this())
+    );
 }
 
-// Handler for the write operation
-void
-WSClient::on_write(
-    beast::error_code ec,
-    std::size_t bytes_transferred)
-{
-    boost::ignore_unused(bytes_transferred);
+void WSClient::close() {
+    ws_.async_close(websocket::close_code::normal,
+        beast::bind_front_handler(&WSClient::on_close, shared_from_this())
+        );
+}
 
-    if(ec)
-        return fail(ec, "write");
+void WSClient::on_close(beast::error_code ec) {
+    if (ec) fail(ec, "close");
+}
 
-    // Write is complete. The read loop is already running.
-    // If you had a request/response pattern where you send one message
-    // and expect one response, you might manage state here.
-    // For a continuous stream, just let do_read handle incoming.
+void WSClient::set_on_message(OnMessageCallback cb)   { on_message_   = std::move(cb); }
+void WSClient::set_on_parsed(OnParsedCallback cb)     { on_parsed_    = std::move(cb); }
+void WSClient::set_on_connected(OnConnectedCallback cb) { on_connected_ = std::move(cb); }
+void WSClient::set_on_error(OnErrorCallback cb)       { on_error_     = std::move(cb); }
+
+void WSClient::fail(const beast::error_code& ec, const char* stage) {
+    std::string msg = stage;
+    if (ec) msg += std::string(": ") + ec.message();
+    if (on_error_) on_error_(msg);
+    else std::cerr << msg << std::endl;
 }

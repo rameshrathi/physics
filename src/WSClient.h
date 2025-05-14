@@ -5,109 +5,101 @@
 #pragma once
 
 #include <boost/beast/core.hpp>
-#include <boost/beast/websocket/stream.hpp>
+#include <boost/beast/websocket.hpp>
+#include <boost/beast/ssl/ssl_stream.hpp>
+#include <boost/asio/ssl.hpp>
 #include <boost/json.hpp>
 #include <functional>
-#include <iostream>
 #include <memory>
 #include <string>
+#include <chrono>
 
-namespace beast = boost::beast;         // from <boost/beast.hpp>
-namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
-namespace asio = boost::asio;           // from <boost/asio.hpp>
-namespace ip = boost::asio::ip;         // from <boost/asio/ip.hpp>
-namespace json = boost::json;           // from <boost/json.hpp>
+namespace beast      = boost::beast;
+namespace websocket  = beast::websocket;
+namespace net        = boost::asio;
+namespace ssl        = net::ssl;
+namespace json       = boost::json;
 
-// Report a failure
-inline void fail(const beast::error_code & ec, char const* what)
-{
-    std::cerr << what << ": " << ec.message() << "\n";
-}
+using   tcp         = net::ip::tcp;
 
-// Callback type for handling received JSON messages
-using JsonResponseCallback = std::function<void(beast::error_code, const json::value&)>;
-
-// Represents a single WebSocket client connection
-class WSClient : public std::enable_shared_from_this<WSClient>
-{
-    ip::tcp::resolver resolver_;
-    websocket::stream<beast::tcp_stream> ws_;
-    beast::flat_buffer buffer_; // Buffer for incoming data
-    std::string host_;
-    std::string port_;
-    std::string target_;
-    JsonResponseCallback callback_;
-
+// JSON parser
+class JSONParser {
 public:
-    // Constructor
-    explicit
-    WSClient(asio::io_context& ioc)
-        : resolver_(ioc)
-        , ws_(ioc)
-    {
-    }
+    virtual ~JSONParser() = default;
+    virtual json::value parse(const std::string& payload) = 0;
+};
 
-    // Destructor (closes the WebSocket connection)
-    ~WSClient()
-    {
-        // Attempt to close the connection gracefully
-        if (ws_.is_open())
-        {
-            beast::error_code ec;
-            ws_.close(websocket::close_code::normal, ec);
-            if (ec)
-            {
-                fail(ec, "close");
-            }
-        }
-    }
+class WSClient : public std::enable_shared_from_this<WSClient> {
+public:
+    using OnMessageCallback   = std::function<void(const std::string&)>;
+    using OnParsedCallback    = std::function<void(const std::string& raw, const json::value& parsed)>;
+    using OnConnectedCallback = std::function<void()>;
+    using OnErrorCallback     = std::function<void(const std::string&)>;
 
-    // Stopping copy/move
-    WSClient(WSClient const&) = delete;
-    WSClient(WSClient&&) = delete;
-    WSClient& operator=(WSClient const&) = delete;
-    WSClient& operator=(WSClient&&) = delete;
+    WSClient(net::io_context& ioc, ssl::context& ctx);
 
-    // Start the asynchronous operation to connect
-    void
-    connect(
-        const std::string& host,
+    // Initiate connection; will retry up to max_retries with retry_delay intervals
+    void connect(
+        const std::string& url,
         const std::string& port,
-        const std::string& target,
-        JsonResponseCallback callback);
+        int max_retries = 3,
+        std::chrono::milliseconds retry_delay = std::chrono::milliseconds(500)
+    );
 
-    // Send a JSON value as a WebSocket text message
-    void
-    send(const json::value& msg);
+    // Send a message; retries on failure
+    void send(
+        const std::string& message,
+        int max_retries = 3,
+        std::chrono::milliseconds retry_delay = std::chrono::milliseconds(200)
+    );
+
+    // Close the WebSocket gracefully
+    void close();
+
+    // Set a custom JSON parser for type T
+    template <typename T>
+    void set_json_parser(std::shared_ptr<JSONParser> parser) {
+        json_parser_ = parser;
+    }
+
+    // Callback setters
+    void set_on_message(OnMessageCallback cb);
+    void set_on_parsed(OnParsedCallback cb);
+    void set_on_connected(OnConnectedCallback cb);
+    void set_on_error(OnErrorCallback cb);
 
 private:
-    // Handler for the resolve operation
-    void
-    on_resolve(
-        beast::error_code ec,
-        const ip::tcp::resolver::results_type& results);
+    // Networking members
+    tcp::resolver                                   resolver_;
+    websocket::stream<beast::ssl_stream<tcp::socket>> ws_;
+    beast::flat_buffer                              buffer_;
+    std::string                                     host_;
 
-    // Handler for the connect operation
-    void
-    on_connect(beast::error_code ec, ip::tcp::resolver::results_type::endpoint_type);
+    // Retry settings
+    int                                              connect_retries_{0};
+    int                                              send_retries_{0};
+    int                                              max_connect_retries_{3};
+    int                                              max_send_retries_{3};
+    std::chrono::milliseconds                        connect_delay_;
+    std::chrono::milliseconds                        send_delay_;
 
-    // Handler for the handshake operation
-    void
-    on_handshake(beast::error_code ec);
+    // Callbacks
+    OnMessageCallback     on_message_;
+    OnParsedCallback      on_parsed_;
+    OnConnectedCallback   on_connected_;
+    OnErrorCallback       on_error_;
 
-    // Start an asynchronous read operation
-    void
-    do_read();
+    // Generic holder for JSONParser<T>
+    std::shared_ptr<void> json_parser_;
 
-    // Handler for the read operation
-    void
-    on_read(
-        beast::error_code ec,
-        std::size_t bytes_transferred);
-
-    // Handler for the write operation
-    void
-    on_write(
-        beast::error_code ec,
-        std::size_t bytes_transferred);
+    // Internal steps
+    void do_resolve();
+    void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
+    void on_connect(beast::error_code ec, tcp::resolver::results_type::endpoint_type endpoint);
+    void on_ssl_handshake(beast::error_code ec);
+    void on_ws_handshake(beast::error_code ec);
+    void on_write(beast::error_code ec, std::size_t bytes_transferred);
+    void on_read(beast::error_code ec, std::size_t bytes_transferred);
+    void on_close(beast::error_code ec);
+    void fail(const beast::error_code& ec, const char* stage);
 };

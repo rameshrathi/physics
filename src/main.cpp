@@ -1,99 +1,70 @@
-#include <boost/beast/core.hpp>
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/json.hpp>
-#include <iostream>
-#include <memory>
-#include <string>
+// main.cpp
 
 #include "WSClient.h"
+#include <boost/json.hpp>
+#include <boost/json/parse.hpp>
+#include <boost/json/value.hpp>
+#include <iostream>
 
-namespace beast = boost::beast;
-namespace http = beast::http;
-namespace websocket = beast::websocket;
-namespace asio = boost::asio;
-namespace ip = boost::asio::ip;
-namespace json = boost::json;
+namespace  json = boost::json;
 
-// Example usage
-int main()
-{
-    // The io_context is required for all I/O
-    asio::io_context ioc;
-
-    // Create multiple clients for different endpoints
-    auto client1 = std::make_shared<WSClient>(ioc);
-    auto client2 = std::make_shared<WSClient>(ioc);
-
-    // Connect client1 to an echo server (replace with your actual endpoint)
-    client1->connect(
-        "echo.websocket.org", // Host
-        "80",                 // Port (use "443" for wss://)
-        "/",                  // Target path
-        [](beast::error_code ec, const json::value& received_json)
-        {
-            if (!ec)
-            {
-                std::cout << "Client 1 received JSON: " << received_json << std::endl;
-                // Process the received JSON here
-                if (received_json.is_object()) {
-                    // Example: Access a field
-                    if (received_json.as_object().count("message")) {
-                         std::cout << "  Message field: " << received_json.as_object().at("message").as_string() << std::endl;
-                    }
-                }
-            }
-            else
-            {
-                std::cerr << "Client 1 error in callback: " << ec.message() << std::endl;
-            }
-        });
-
-    // Connect client2 to another endpoint (replace with your actual endpoint)
-     client2->connect(
-        "echo.websocket.org", // Host
-        "80",                 // Port
-        "/some/other/path",   // Different target path
-        [](beast::error_code ec, const json::value& received_json)
-        {
-            if (!ec)
-            {
-                std::cout << "Client 2 received JSON: " << received_json << std::endl;
-                 if (received_json.is_object()) {
-                    // Example: Access a field
-                    if (received_json.as_object().count("data")) {
-                         std::cout << "  Data field: " << received_json.as_object().at("data") << std::endl;
-                    }
-                }
-            }
-            else
-            {
-                std::cerr << "Client 2 error in callback: " << ec.message() << std::endl;
-            }
-        });
-
-
-    // Give some time for connections to establish before sending
-    asio::steady_timer timer(ioc, std::chrono::seconds(2));
-    timer.async_wait([&](const beast::error_code& ec) {
-        if (!ec) {
-            // Send a JSON message from client1
-            json::value msg1 = {{"command", "hello"}, {"user", "client1"}};
-            client1->send(msg1);
-
-             // Send a JSON message from client2
-            const json::value msg2 = {{"type", "request"}, {"data", 123}};
-            client2->send(msg2);
-        } else {
-             std::cerr << "Timer error: " << ec.message() << std::endl;
+namespace stock {
+    // Example stock ticker
+    struct Ticker {
+        std::string symbol;
+        double price{};
+    };
+    // Example stock ticker parser
+    class StockParser final {
+    public:
+        static Ticker parse(const json::value& json) {
+            Ticker tk;
+            tk.symbol = json.at("symbol").as_string();
+            return tk;
         }
+    };
+} // stock
+
+int main() {
+    net::io_context ioc;
+    ssl::context ctx(ssl::context::tlsv12_client);
+    ctx.set_default_verify_paths();
+
+    const auto client = std::make_shared<WSClient>(ioc, ctx);
+
+    // Install JSON parser
+    const auto parser = std::make_shared<stock::StockParser>();
+    client->set_json_parser<stock::Ticker>(parser);
+
+    // Callbacks
+    client->set_on_connected([]{
+        std::cout << "[Connected]" << std::endl;
     });
 
+    client->set_on_message([](const std::string& raw){
+        std::cout << "[Raw  incoming] " << raw << std::endl;
+    });
 
-    // Run the I/O service. The call will return when there are no more
-    // asynchronous operations pending.
-    std::cout << "Starting io_context run..." << std::endl;
+    client->set_on_parsed([](const std::string& raw, const json::value& parsed){
+        std::cout << "[Parsed incoming] " << parsed << std::endl;
+    });
+
+    client->set_on_error([](const std::string& err){
+        std::cerr << "[Error] " << err << std::endl;
+    });
+
+    // Connect to
+    client->connect("echo.websocket.events", "443");
+
+    // Once connected, send a JSON message
+    client->set_on_connected([&]{
+        json::value msg = {
+            {"type", "greeting"},
+            {"payload", "Hello, secure echo!"}
+        };
+        client->send("msg");
+    });
+
     ioc.run();
-    std::cout << "io_context run finished." << std::endl;
-
     return 0;
 }
