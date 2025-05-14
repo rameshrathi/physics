@@ -23,10 +23,12 @@ namespace json       = boost::json;
 using   tcp         = net::ip::tcp;
 
 // JSON parser
-class JSONParser {
+class JSONParser final {
 public:
-    virtual ~JSONParser() = default;
-    virtual json::value parse(const std::string& payload) = 0;
+    static json::value parse(const std::string& payload) {
+        json::value v = json::parse(payload);
+        return v;
+    }
 };
 
 class WSClient : public std::enable_shared_from_this<WSClient> {
@@ -74,6 +76,7 @@ private:
     websocket::stream<beast::ssl_stream<tcp::socket>> ws_;
     beast::flat_buffer                              buffer_;
     std::string                                     host_;
+    std::string                                     port_;
 
     // Retry settings
     int                                              connect_retries_{0};
@@ -101,5 +104,5 @@ private:
     void on_write(beast::error_code ec, std::size_t bytes_transferred);
     void on_read(beast::error_code ec, std::size_t bytes_transferred);
     void on_close(beast::error_code ec);
-    void fail(const beast::error_code& ec, const char* stage);
+    void fail(const beast::error_code& ec, const char* stage) const;
 };

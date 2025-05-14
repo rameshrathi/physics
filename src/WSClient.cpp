@@ -25,6 +25,7 @@ void WSClient::connect(
     std::chrono::milliseconds retry_delay
 ) {
     host_ = url;
+    port_ = port;
     max_connect_retries_ = max_retries;
     connect_delay_ = retry_delay;
     connect_retries_ = 0;
@@ -32,7 +33,7 @@ void WSClient::connect(
 }
 
 void WSClient::do_resolve() {
-    resolver_.async_resolve(host_, ":" + ws_.next_layer().next_layer().remote_endpoint().port(),
+    resolver_.async_resolve(host_, port_,
         beast::bind_front_handler(&WSClient::on_resolve, shared_from_this())
         );
 }
@@ -155,7 +156,7 @@ void WSClient::set_on_parsed(OnParsedCallback cb)     { on_parsed_    = std::mov
 void WSClient::set_on_connected(OnConnectedCallback cb) { on_connected_ = std::move(cb); }
 void WSClient::set_on_error(OnErrorCallback cb)       { on_error_     = std::move(cb); }
 
-void WSClient::fail(const beast::error_code& ec, const char* stage) {
+void WSClient::fail(const beast::error_code& ec, const char* stage) const {
     std::string msg = stage;
     if (ec) msg += std::string(": ") + ec.message();
     if (on_error_) on_error_(msg);

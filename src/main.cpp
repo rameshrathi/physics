@@ -2,7 +2,6 @@
 
 #include "WSClient.h"
 #include <boost/json.hpp>
-#include <boost/json/parse.hpp>
 #include <boost/json/value.hpp>
 #include <iostream>
 
@@ -15,9 +14,8 @@ namespace stock {
         double price{};
     };
     // Example stock ticker parser
-    class StockParser final {
-    public:
-        static Ticker parse(const json::value& json) {
+    struct BuildTicker final {
+        static Ticker build(const json::value& json) {
             Ticker tk;
             tk.symbol = json.at("symbol").as_string();
             return tk;
@@ -33,8 +31,8 @@ int main() {
     const auto client = std::make_shared<WSClient>(ioc, ctx);
 
     // Install JSON parser
-    const auto parser = std::make_shared<stock::StockParser>();
-    client->set_json_parser<stock::Ticker>(parser);
+    const auto parser = std::make_shared<JSONParser>();
+    client->set_json_parser<JSONParser>(parser);
 
     // Callbacks
     client->set_on_connected([]{
