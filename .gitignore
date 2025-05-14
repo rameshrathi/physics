@@ -1,0 +1,7 @@
+external
+cmake-build-debug
+build
+.cache
+.idea
+.DS_Store
+
