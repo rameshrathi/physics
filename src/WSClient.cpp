@@ -21,7 +21,7 @@ WSClient::WSClient(net::io_context& ioc, ssl::context& ctx)
 void WSClient::connect(
     const std::string& url,
     const std::string& port,
-    int max_retries,
+    const int max_retries,
     std::chrono::milliseconds retry_delay
 ) {
     host_ = url;

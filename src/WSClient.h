@@ -59,7 +59,6 @@ public:
     void close();
 
     // Set a custom JSON parser for type T
-    template <typename T>
     void set_json_parser(std::shared_ptr<JSONParser> parser) {
         json_parser_ = parser;
     }
