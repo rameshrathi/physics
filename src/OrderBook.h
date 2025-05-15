@@ -10,18 +10,11 @@
 
 #include "WSClient.h"
 
-namespace  json = boost::json;
-
 namespace stock {
-    // Example stock ticker
-    struct AmountAndPrice {
-        double amount{};
-        double price{};
-        AmountAndPrice() = default;
-        AmountAndPrice(const json::string & str1, const json::string & str2)
-            : amount(0), price(0)
-            {}
-    };
+
+    namespace  json = boost::json;
+
+    using PriceLevel = std::pair<double, double>;
 
     // Orderbook Processor
     class Orderbook {
@@ -37,25 +30,46 @@ namespace stock {
             orderbook.clear();
         }
 
-        std::string getSymbol() const { return symbol; }
-        std::string getTimestamp() const { return timestamp; }
+        [[nodiscard]]
+        const std::string & getSymbol() const { return symbol; }
 
-        std::vector<AmountAndPrice> getBids() const { return bids; }
-        std::vector<AmountAndPrice> getAsks() const { return asks; }
+        [[nodiscard]]
+        const std::string & getTimestamp() const { return timestamp; }
+
+        [[nodiscard]]
+        const std::vector<PriceLevel> & getBids() const { return bids; }
+
+        [[nodiscard]]
+        const std::vector<PriceLevel> & getAsks() const { return asks; }
 
         Orderbook()
             : Orderbook("", "", {}, {})
             {}
 
-        Orderbook(std::string symbol, std::string timestamp, std::vector<stock::AmountAndPrice> bids, std::vector<stock::AmountAndPrice> asks)
+        Orderbook(std::string symbol, std::string timestamp, std::vector<stock::PriceLevel> bids, std::vector<stock::PriceLevel> asks)
             : symbol(std::move(symbol)), timestamp(std::move(timestamp)), bids(std::move(bids)), asks(std::move(asks))
             {}
+
+        Orderbook(const Orderbook& other) {
+            symbol = other.symbol;
+            timestamp = other.timestamp;
+            bids = other.bids;
+            asks = other.asks;
+        }
+
+        Orderbook& operator = (const Orderbook& other) {
+            symbol = other.symbol;
+            timestamp = other.timestamp;
+            bids = other.bids;
+            asks = other.asks;
+            return *this;
+        }
 
     private:
         std::string symbol;
         std::string timestamp;
-        std::vector<AmountAndPrice> bids;
-        std::vector<AmountAndPrice> asks;
+        std::vector<PriceLevel> bids;
+        std::vector<PriceLevel> asks;
         std::mutex mutex_;
 
         void clear() {
@@ -70,8 +84,8 @@ namespace stock {
     struct OrderbookParser final : IParser<Orderbook> {
         Orderbook operator() (const std::string& msg) const override {
             // Data members
-            std::vector<AmountAndPrice> bids;
-            std::vector<AmountAndPrice> asks;
+            std::vector<PriceLevel> bids;
+            std::vector<PriceLevel> asks;
             std::string symbol;
             std::string timestamp;
 
@@ -82,13 +96,13 @@ namespace stock {
             for (auto& obj : asks_data) {
                 if (obj.is_array()) {
                     auto arr = obj.as_array();
-                    asks.emplace_back(AmountAndPrice{arr[0].as_string(), arr[1].as_string()});
+                    asks.emplace_back(200.0, 2.0);
                 }
             }
             json::array bids_data = parsed.at("bids").as_array();
             for (json::value& obj : bids_data) {
                 json::array & arr = obj.as_array();
-                bids.emplace_back(AmountAndPrice{ arr[0].as_string(), arr[1].as_string() });
+                bids.emplace_back(300.0, 3.0);
             }
             return Orderbook{symbol, timestamp, bids, asks};
         }

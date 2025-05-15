@@ -5,6 +5,7 @@
 
 #include <string>
 #include <chrono>
+#include <utility>
 
 #include "OrderBook.h"
 
@@ -20,51 +21,62 @@ struct Config {
 // Calculation Engine
 class CalculationEngine {
 public:
-    CalculationEngine(const Config& cfg) : config(cfg) {}
+    explicit CalculationEngine(Config  cfg) : config(std::move(cfg)) {}
 
     void processTick(const stock::Orderbook& ob) {
+        book = ob;
         auto start = std::chrono::high_resolution_clock::now();
         slippage = computeSlippage(ob);
         fees = computeFees();
         marketImpact = computeMarketImpact(ob);
         netCost = slippage + fees + marketImpact;
-        makerTakerProp = computeMakerTaker(ob);
+        makerTakerProp = computeMakerTaker();
         auto end = std::chrono::high_resolution_clock::now();
-        latency = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+        // latency = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     }
 
-    double getSlippage() const { return slippage; }
-    double getFees() const { return fees; }
-    double getMarketImpact() const { return marketImpact; }
-    double getNetCost() const { return netCost; }
-    double getMaker() { return makerTakerProp; }
+    [[nodiscard]] double getSlippage() const { return slippage; }
+    [[nodiscard]] double getFees() const { return fees; }
+    [[nodiscard]] double getMarketImpact() const { return marketImpact; }
+    [[nodiscard]] double getNetCost() const { return netCost; }
+    [[nodiscard]] double getMaker() const { return makerTakerProp; }
 
-    double computeSlippage(const stock::Orderbook& ob) {
+    [[nodiscard]]
+    double computeSlippage(const stock::Orderbook& ob) const {
         // Simplified linear regression for slippage
-        double depth = ob.getBids()[0].price + ob.getAsks()[0].price;
+        double depth = ob.getBids()[0].second + ob.getAsks()[0].second;
         return config.quantity / depth * 0.01; // Example model
     }
 
-    double computeFees() {
+    [[nodiscard]]
+    double computeFees() const {
         // Rule-based fee model (e.g., 0.1% taker fee)
         return config.quantity * 0.001;
     }
 
-    double computeMarketImpact(const stock::Orderbook& ob) {
+    [[nodiscard]]
+    double computeMarketImpact(const stock::Orderbook& ob) const {
         // Simplified Almgren-Chriss model
-        double spread = ob.getAsks()[0].amount - ob.getBids()[0].amount;
+        double spread = ob.getAsks()[0].first - ob.getBids()[0].first;
         return config.quantity * spread * config.volatility;
     }
 
-    double computeMakerTaker(const stock::Orderbook& ob) {
+    [[nodiscard]]
+    double computeMakerTaker() const {
         // Simplified logistic regression
-        double spread = ob.getAsks()[0].amount - ob.getBids()[0].amount;
+        double spread = book.getAsks()[0].first - book.getBids()[0].first;
         return 1.0 / (1.0 + std::exp(-spread)); // Sigmoid function
     }
 
+    [[nodiscard]]
+    const std::vector<stock::PriceLevel> & getBids() const { return book.getBids(); }
+
+    [[nodiscard]]
+    const std::vector<stock::PriceLevel> & getAsks() const { return book.getAsks(); }
+
 private:
     Config config;
+    stock::Orderbook book;
     double slippage = 0.0, fees = 0.0, marketImpact = 0.0, netCost = 0.0, makerTakerProp = 0.0;
     double latency = 0.0; // Microseconds
 };
-

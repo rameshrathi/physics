@@ -16,6 +16,7 @@ find_package(Boost 1.88 CONFIG REQUIRED
 )
 find_package(OpenSSL REQUIRED)
 find_package(Threads REQUIRED)
+find_library(OpenGL_FRAMEWORK OpenGL)
 
 add_executable(trade_simulator
         src/main.cpp
@@ -29,6 +30,8 @@ add_subdirectory(external/glfw)
 target_include_directories(trade_simulator PRIVATE
         ${Boost_INCLUDE_DIRS}
         ${OPENSSL_INCLUDE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui/backends
 )
 
 target_link_libraries(trade_simulator PRIVATE
@@ -42,4 +45,5 @@ target_link_libraries(trade_simulator PRIVATE
     Threads::Threads
     imgui
     glfw
+    ${OpenGL_FRAMEWORK}
 )
