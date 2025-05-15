@@ -4,26 +4,19 @@
 #include <boost/json.hpp>
 #include <boost/json/value.hpp>
 #include <iostream>
+#include <vector>
 
 namespace  json = boost::json;
 
-namespace stock {
-    // Example stock ticker
-    struct Ticker {
-        std::string symbol;
-        double price{};
-    };
-    // Example stock ticker parser
-    struct TickerParser final : IParser<Ticker> {
-        Ticker operator()(const std::string& msg) const override {
-            Ticker ticker;
-            json::value parsed = json::parse(msg);
-            ticker.symbol = parsed.at("symbol").as_string();
-            ticker.price = parsed.at("price").as_double();
-            return ticker;
-        }
-    };
-} // stock
+// Configuration Module
+struct Config {
+    std::string exchange = "OKX";
+    std::string spotAsset = "BTC-USDT-SWAP";
+    std::string orderType = "market";
+    double quantity = 100.0; // USD equivalent
+    double volatility = 0.02; // Example value
+    int feeTier = 0; // Example tier
+};
 
 int main() {
     net::io_context ioc;
@@ -43,7 +36,7 @@ int main() {
 
     const stock::TickerParser parser;
     client->set_parser<stock::Ticker>(parser, [](const stock::Ticker& ticker) {
-        std::cout << "[Parsed outgoing] " << ticker.symbol << " " << ticker.price << std::endl;
+        std::cout << "[Parsed outgoing] " << ticker.symbol << " " << ticker.asks.size() << std::endl;
     });
 
     client->set_on_error([](const std::string& err){
@@ -59,7 +52,7 @@ int main() {
             {"type", "greeting"},
             {"payload", "Hello, secure echo!"}
         };
-        client->send("msg");
+        client->send("Hello From Client!");
     });
 
     ioc.run();

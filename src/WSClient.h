@@ -42,14 +42,14 @@ public:
     void connect(
         const std::string& url,
         const std::string& port,
-        int max_retries = 3,
+        int connect_retries = 3,
         std::chrono::milliseconds retry_delay = std::chrono::milliseconds(500)
     );
 
     // Send a message; retries on failure
     void send(
         const std::string& message,
-        int max_retries = 3,
+        int send_retries = 3,
         std::chrono::milliseconds retry_delay = std::chrono::milliseconds(200)
     );
 
@@ -95,12 +95,9 @@ private:
     std::string                                     port_;
 
     // Retry settings
-    int                                              connect_retries_{0};
-    int                                              send_retries_{0};
-    int                                              max_connect_retries_{3};
-    int                                              max_send_retries_{3};
-    std::chrono::milliseconds                        connect_delay_;
-    std::chrono::milliseconds                        send_delay_;
+    bool                                             is_writing_;
+    int                                              connect_retry_count_;
+    int                                              send_retry_count_;
 
     // Callbacks
     OnMessageCallback     on_message_;

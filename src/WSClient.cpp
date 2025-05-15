@@ -9,6 +9,7 @@
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <iostream>
+#include <chrono>
 #include "WSClient.h"
 
 namespace  json = boost::json;
@@ -16,34 +17,35 @@ namespace  json = boost::json;
 WSClient::WSClient(net::io_context& ioc, ssl::context& ctx)
     : resolver_(net::make_strand(ioc)),
     ws_(net::make_strand(ioc), ctx),
-    connect_delay_(0),
-    send_delay_(0)
+    is_writing_(false),
+    connect_retry_count_(3),
+    send_retry_count_(3)
     {}
 
 void WSClient::connect(
     const std::string& url,
     const std::string& port,
-    const int max_retries,
+    const int connect_retries,
     std::chrono::milliseconds retry_delay
 ) {
     host_ = url;
     port_ = port;
-    max_connect_retries_ = max_retries;
-    connect_delay_ = retry_delay;
-    connect_retries_ = 0;
     do_resolve();
 }
 
+// =======   CONNECT   =======
 void WSClient::do_resolve() {
-    resolver_.async_resolve(host_, port_,
-        beast::bind_front_handler(&WSClient::on_resolve, shared_from_this())
-        );
+    if (connect_retry_count_--) {
+        resolver_.async_resolve(
+            host_, port_,
+            beast::bind_front_handler(&WSClient::on_resolve, shared_from_this()));
+    }
 }
 
 void WSClient::on_resolve(beast::error_code ec, const tcp::resolver::results_type& results) {
     if (ec) {
-        if (connect_retries_++ < max_connect_retries_) {
-            std::this_thread::sleep_for(connect_delay_);
+        if (connect_retry_count_--) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Some delay for reconnection
             do_resolve();
             return;
         }
@@ -58,8 +60,8 @@ void WSClient::on_resolve(beast::error_code ec, const tcp::resolver::results_typ
 
 void WSClient::on_connect(beast::error_code ec, tcp::resolver::results_type::endpoint_type) {
     if (ec) {
-        if (connect_retries_++ < max_connect_retries_) {
-            std::this_thread::sleep_for(connect_delay_);
+        if (connect_retry_count_--) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Some delay for reconnection
             do_resolve();
             return;
         }
@@ -70,6 +72,7 @@ void WSClient::on_connect(beast::error_code ec, tcp::resolver::results_type::end
         beast::bind_front_handler(&WSClient::on_ssl_handshake, shared_from_this()));
 }
 
+// =======   SSL HANDSHAKE CALLBACKS   =======
 void WSClient::on_ssl_handshake(beast::error_code ec) {
     if (ec) return fail(ec, "ssl_handshake");
     ws_.async_handshake(host_, "/",
@@ -85,38 +88,7 @@ void WSClient::on_ws_handshake(beast::error_code ec) {
         );
 }
 
-void WSClient::send(
-    const std::string& message,
-    const int max_retries,
-    std::chrono::milliseconds retry_delay)
-{
-    max_send_retries_ = max_retries;
-    send_delay_ = retry_delay;
-    send_retries_ = 0;
-    ws_.async_write(
-        net::buffer(message),
-        beast::bind_front_handler(&WSClient::on_write, shared_from_this())
-        );
-}
-
-void WSClient::on_write(beast::error_code ec, std::size_t) {
-    if (ec) {
-        if (send_retries_++ < max_send_retries_) {
-            std::this_thread::sleep_for(send_delay_);
-            ws_.async_write(
-                net::buffer(buffer_.data()),
-                beast::bind_front_handler(&WSClient::on_write, shared_from_this())
-                );
-            return;
-        }
-        return fail(ec, "write");
-    }
-    buffer_.consume(buffer_.size());
-        ws_.async_read(buffer_,
-        beast::bind_front_handler(&WSClient::on_read, shared_from_this())
-        );
-}
-
+// =======   READ   =======
 void WSClient::on_read(beast::error_code ec, std::size_t) {
     if (ec)
         return fail(ec, "read");
@@ -135,6 +107,41 @@ void WSClient::on_read(beast::error_code ec, std::size_t) {
         );
 }
 
+// =======   WRITE ==============
+void WSClient::send(
+    const std::string& message,
+    const int retry_count,
+    std::chrono::milliseconds retry_delay)
+{
+    // Synchronize write
+    if (is_writing_) return;
+    is_writing_ = true;
+
+    // Retry if failed
+    send_retry_count_ = retry_count;
+
+    ws_.async_write(
+        net::buffer(message),
+        beast::bind_front_handler(&WSClient::on_write, shared_from_this())
+        );
+}
+
+void WSClient::on_write(beast::error_code ec, std::size_t) {
+    if (ec) {
+        if (send_retry_count_--) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Some delay in resend if failed
+            ws_.async_write(
+                net::buffer(buffer_.data()),
+                beast::bind_front_handler(&WSClient::on_write, shared_from_this())
+                );
+            return;
+        }
+        return fail(ec, "write");
+    }
+    is_writing_ = false;
+}
+
+// =======   CLOSE   =======
 void WSClient::close() {
     ws_.async_close(websocket::close_code::normal,
         beast::bind_front_handler(&WSClient::on_close, shared_from_this())
