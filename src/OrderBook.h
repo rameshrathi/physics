@@ -11,9 +11,7 @@
 #include "WSClient.h"
 
 namespace stock {
-
     namespace  json = boost::json;
-
     using PriceLevel = std::pair<double, double>;
 
     // Orderbook Processor

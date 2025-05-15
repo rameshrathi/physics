@@ -60,8 +60,8 @@ void WSClient::on_resolve(beast::error_code ec, const tcp::resolver::results_typ
 
 void WSClient::on_connect(beast::error_code ec, tcp::resolver::results_type::endpoint_type) {
     if (ec) {
-        if (connect_retry_count_--) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Some delay for reconnection
+        if (--connect_retry_count_) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
             do_resolve();
             return;
         }

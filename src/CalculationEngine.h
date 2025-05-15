@@ -21,7 +21,7 @@ struct Config {
 // Calculation Engine
 class CalculationEngine {
 public:
-    explicit CalculationEngine(Config  cfg) : config(std::move(cfg)) {}
+    explicit CalculationEngine(Config cfg) : config(std::move(cfg)) {}
 
     void processTick(const stock::Orderbook& ob) {
         book = ob;

@@ -57,24 +57,6 @@ int main() {
         client->send("Hello From Client!");
     });
 
-
-    // std::thread wsThread([&ws, &ob, &calc]() {
-    //     ws.onMessage([&ob, &calc](const json& data) {
-    //         ob.updateOrderbook(data);
-    //         calc.processTick(ob);
-    //     });
-    //     ws.connect("wss://ws.gomarket-cpp.goquant.io/ws/l2-orderbook/okx/BTC-USDT-SWAP");
-    // });
-    //
-    // // Main loop (simplified, assumes ImGui setup)
-    // while (true) {
-    //     ui.render();
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(16)); // ~60 FPS
-    // }
-    //
-    // wsThread.join();
-
-
     ioc.run();
     return 0;
 }
