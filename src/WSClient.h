@@ -22,19 +22,17 @@ namespace json       = boost::json;
 
 using   tcp         = net::ip::tcp;
 
-// JSON parser
-class JSONParser final {
+// Parser interface
+template <typename T>
+class IParser {
 public:
-    static json::value parse(const std::string& payload) {
-        json::value v = json::parse(payload);
-        return v;
-    }
+    virtual T operator()(const std::string& msg) const = 0;
+    virtual ~IParser() = default;
 };
 
 class WSClient : public std::enable_shared_from_this<WSClient> {
 public:
     using OnMessageCallback   = std::function<void(const std::string&)>;
-    using OnParsedCallback    = std::function<void(const std::string& raw, const json::value& parsed)>;
     using OnConnectedCallback = std::function<void()>;
     using OnErrorCallback     = std::function<void(const std::string&)>;
 
@@ -58,14 +56,18 @@ public:
     // Close the WebSocket gracefully
     void close();
 
-    // Set a custom JSON parser for type T
-    void set_json_parser(std::shared_ptr<JSONParser> parser) {
-        json_parser_ = parser;
-    }
+    // Store parser and callback with type erasure
+    struct ParserBase {
+        virtual void parseAndCallback(const std::string& msg) const = 0;
+        virtual ~ParserBase() = default;
+    };
+
+    // Set parser and callback
+    template <typename T>
+    void set_parser(const IParser<T>& parser, std::function<void(const T&)> onParsed);
 
     // Callback setters
     void set_on_message(OnMessageCallback cb);
-    void set_on_parsed(OnParsedCallback cb);
     void set_on_connected(OnConnectedCallback cb);
     void set_on_error(OnErrorCallback cb);
 
@@ -87,12 +89,11 @@ private:
 
     // Callbacks
     OnMessageCallback     on_message_;
-    OnParsedCallback      on_parsed_;
     OnConnectedCallback   on_connected_;
     OnErrorCallback       on_error_;
 
-    // Generic holder for JSONParser<T>
-    std::shared_ptr<void> json_parser_;
+    // parser handler
+    std::unique_ptr<ParserBase> parser_handler_;
 
     // Internal steps
     void do_resolve();
@@ -102,6 +103,6 @@ private:
     void on_ws_handshake(beast::error_code ec);
     void on_write(beast::error_code ec, std::size_t bytes_transferred);
     void on_read(beast::error_code ec, std::size_t bytes_transferred);
-    void on_close(beast::error_code ec);
+    void on_close(beast::error_code ec) const;
     void fail(const beast::error_code& ec, const char* stage) const;
 };

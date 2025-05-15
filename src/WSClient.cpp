@@ -115,30 +115,37 @@ void WSClient::on_write(beast::error_code ec, std::size_t) {
         );
 }
 
+// Parsing logic
+template <typename T>
+class ParserWrapper : public WSClient::ParserBase {
+    const IParser<T>& parser;
+    std::function<void(const T&)> callback;
+public:
+    ParserWrapper(const IParser<T>& p, std::function<void(const T&)> cb)
+        : parser(p), callback(std::move(cb)) {}
+
+    void parseAndCallback(const std::string& msg) const override {
+        T obj = parser(msg);
+        callback(obj);
+    }
+};
+
 void WSClient::on_read(beast::error_code ec, std::size_t) {
     if (ec)
         return fail(ec, "read");
 
-    std::string raw = beast::buffers_to_string(buffer_.data());
+    const std::string raw = beast::buffers_to_string(buffer_.data());
     if (on_message_)
         on_message_(raw);
 
     // Attempt parsing if parser provided
-    if (json_parser_ && on_parsed_) {
-        try {
-            // Cast back to actual parser
-            const std::shared_ptr<JSONParser> parser = std::static_pointer_cast<JSONParser>(json_parser_);
-            const json::value parsed = parser->parse(raw);
-            on_parsed_(raw, parsed);
-        }
-        catch (const std::exception& ex) {
-            fail(beast::error_code{}, ex.what());
-        }
+    if (parser_handler_) {
+        parser_handler_->parseAndCallback(raw);
     }
     buffer_.consume(buffer_.size());
     ws_.async_read(buffer_,
-    beast::bind_front_handler(&WSClient::on_read, shared_from_this())
-    );
+        beast::bind_front_handler(&WSClient::on_read, shared_from_this())
+        );
 }
 
 void WSClient::close() {
@@ -147,12 +154,13 @@ void WSClient::close() {
         );
 }
 
-void WSClient::on_close(beast::error_code ec) {
+void WSClient::on_close(beast::error_code ec) const {
     if (ec) fail(ec, "close");
 }
 
+template <typename T>
+void WSClient::set_parser(const IParser<T>& parser, std::function<void(const T&)> onParsed) { parser_handler_ = std::make_unique<ParserWrapper<T>>(parser, std::move(onParsed)); }
 void WSClient::set_on_message(OnMessageCallback cb)   { on_message_   = std::move(cb); }
-void WSClient::set_on_parsed(OnParsedCallback cb)     { on_parsed_    = std::move(cb); }
 void WSClient::set_on_connected(OnConnectedCallback cb) { on_connected_ = std::move(cb); }
 void WSClient::set_on_error(OnErrorCallback cb)       { on_error_     = std::move(cb); }
 
