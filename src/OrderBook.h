@@ -15,11 +15,11 @@ namespace  json = boost::json;
 namespace stock {
     // Example stock ticker
     struct AmountAndPrice {
-        std::string amount{};
-        std::string price{};
+        double amount{};
+        double price{};
         AmountAndPrice() = default;
         AmountAndPrice(const json::string & str1, const json::string & str2)
-            : amount(str1), price(str2)
+            : amount(0), price(0)
             {}
     };
 

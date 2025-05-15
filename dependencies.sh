@@ -51,7 +51,7 @@ fi
 # Download ImgUI if it doesn't exist
 if [ ! -d "imgui" ]; then
     echo "Cloning Dear ImGui..."
-    git clone --depth=1 https://github.com/ocornut/imgui.git external
+    git clone --depth=1 https://github.com/ocornut/imgui.git external/imgui
 else
     echo "ImGui already cloned."
 fi

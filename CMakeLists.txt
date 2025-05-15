@@ -9,6 +9,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(BOOST_ROOT "${CMAKE_SOURCE_DIR}/external/boost")
+set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/external/imgui")
 
 find_package(Boost 1.88 CONFIG REQUIRED
         COMPONENTS system json thread filesystem
@@ -23,9 +24,9 @@ add_executable(trade_simulator
 
 # ImGUI
 add_subdirectory(external/imgui)
+add_subdirectory(external/glfw)
 
 target_include_directories(trade_simulator PRIVATE
-        external/imgui
         ${Boost_INCLUDE_DIRS}
         ${OPENSSL_INCLUDE_DIR}
 )
@@ -40,5 +41,5 @@ target_link_libraries(trade_simulator PRIVATE
     OpenSSL::Crypto
     Threads::Threads
     imgui
+    glfw
 )
-

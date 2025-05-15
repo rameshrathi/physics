@@ -4,17 +4,10 @@
 
 #pragma once
 
+#include <string>
 #include <imgui.h>
 
-// Configuration Module
-struct Config {
-    std::string exchange = "OKX";
-    std::string spotAsset = "BTC-USDT-SWAP";
-    std::string orderType = "market";
-    double quantity = 100.0; // USD equivalent
-    double volatility = 0.02; // Example value
-    int feeTier = 0; // Example tier
-};
+#include "CalculationEngine.h"
 
 // UI Module
 class UIModule {
@@ -42,6 +35,6 @@ public:
     }
 private:
     const Config& config;
-    const CalculationEngine& calc;
+    const CalculationEngine & calc;
 };
 
