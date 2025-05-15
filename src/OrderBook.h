@@ -20,7 +20,7 @@ namespace stock {
         AmountAndPrice() = default;
         AmountAndPrice(const json::string & str1, const json::string & str2)
             : amount(str1), price(str2)
-        {}
+            {}
     };
 
     // Orderbook Processor

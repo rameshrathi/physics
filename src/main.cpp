@@ -4,19 +4,10 @@
 #include <boost/json.hpp>
 #include <boost/json/value.hpp>
 #include <iostream>
-#include <vector>
+
+#include "OrderBook.h"
 
 namespace  json = boost::json;
-
-// Configuration Module
-struct Config {
-    std::string exchange = "OKX";
-    std::string spotAsset = "BTC-USDT-SWAP";
-    std::string orderType = "market";
-    double quantity = 100.0; // USD equivalent
-    double volatility = 0.02; // Example value
-    int feeTier = 0; // Example tier
-};
 
 int main() {
     net::io_context ioc;
@@ -34,9 +25,9 @@ int main() {
         std::cout << "[Raw  incoming] " << raw << std::endl;
     });
 
-    const stock::TickerParser parser;
-    client->set_parser<stock::Ticker>(parser, [](const stock::Ticker& ticker) {
-        std::cout << "[Parsed outgoing] " << ticker.symbol << " " << ticker.asks.size() << std::endl;
+    const stock::OrderbookParser parser;
+    client->set_parser<stock::Orderbook>(parser, [](const stock::Orderbook& ob) {
+        std::cout << "[Parsed outgoing] " << ob.getSymbol() << " " << ob.getTimestamp() << std::endl;
     });
 
     client->set_on_error([](const std::string& err){

@@ -21,7 +21,11 @@ add_executable(trade_simulator
         src/WSClient.cpp
 )
 
+# ImGUI
+add_subdirectory(external/imgui)
+
 target_include_directories(trade_simulator PRIVATE
+        external/imgui
         ${Boost_INCLUDE_DIRS}
         ${OPENSSL_INCLUDE_DIR}
 )
@@ -35,5 +39,6 @@ target_link_libraries(trade_simulator PRIVATE
     OpenSSL::SSL
     OpenSSL::Crypto
     Threads::Threads
+    imgui
 )
 

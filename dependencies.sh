@@ -25,12 +25,6 @@ if ! command_exists curl; then
     exit 1
 fi
 
-if ! command_exists git; then
-    echo "Error: git is required but not installed. Please install git and try again."
-    exit 1
-fi
-
-# ==========================================
 # Create external folder if it doesn't exist
 echo "Checking for external directory..."
 if [ ! -d "$EXTERNAL_DIR" ]; then
@@ -54,21 +48,17 @@ else
     echo "Boost already exists at ${BOOST_DIR}, Installing it"
 fi
 
-# Download FTXUI if it doesn't exist
-echo "Checking for FTXUI at ${FTXUI_DIR}..."
-if [ ! -d "${FTXUI_DIR}" ]; then
-    echo "FTXUI not found. Cloning..."
-
-    git clone --depth 1 "${FTXUI_REPO}" "${FTXUI_DIR}"
-    echo "FTXUI has been cloned to ${FTXUI_DIR}"
+# Download ImgUI if it doesn't exist
+if [ ! -d "imgui" ]; then
+    echo "Cloning Dear ImGui..."
+    git clone --depth=1 https://github.com/ocornut/imgui.git external
 else
-    echo "FTXUI directory already exists at ${FTXUI_DIR}"
+    echo "ImGui already cloned."
 fi
 
 # ========== Installing boost ====================
 echo "=== All dependencies downloaded now installing boost ==="
 cd external/boost
-# Bootstrap Boost.Build and set install prefix to this directory
 ./bootstrap.sh --prefix="$(pwd)"
-
-echo "=== All dependencies are set up ==="
+./b2
+echo "Installation completed..."
