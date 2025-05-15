@@ -11,27 +11,10 @@ BOOST_FILENAME="boost_${BOOST_VERSION//./_}"
 BOOST_ARCHIVE="${BOOST_FILENAME}.tar.gz"
 BOOST_URL="https://archives.boost.io/release/${BOOST_VERSION}/source/${BOOST_ARCHIVE}"
 
-FTXUI_DIR="${EXTERNAL_DIR}/ftxui"
-FTXUI_REPO="https://github.com/ArthurSonzogni/FTXUI.git"
-
-# Function to check if a command exists
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
-}
-
-# Check for required commands
-if ! command_exists curl; then
-    echo "Error: curl is required but not installed. Please install curl and try again."
-    exit 1
-fi
-
 # Create external folder if it doesn't exist
-echo "Checking for external directory..."
 if [ ! -d "$EXTERNAL_DIR" ]; then
     echo "Creating external directory at ${EXTERNAL_DIR}"
     mkdir -p "$EXTERNAL_DIR"
-else
-    echo "External directory already exists."
 fi
 
 # Download Boost if it doesn't exist
@@ -44,21 +27,50 @@ if [ ! -d "${BOOST_DIR}" ]; then
     curl -fSL "${BOOST_URL}" | \
       tar -xz --strip-components=1 -C "${BOOST_DIR}"
     echo "Boost ${BOOST_VERSION} downloaded and extracted to ${BOOST_DIR}"
+    cd external/boost
+    ./bootstrap.sh --prefix="$(pwd)"
+    ./b2
+    cd ../..
 else
-    echo "Boost already exists at ${BOOST_DIR}, Installing it"
+    echo "Boost already installed..."
 fi
 
 # Download ImgUI if it doesn't exist
-if [ ! -d "imgui" ]; then
+if [ ! -d "external/imgui" ]; then
     echo "Cloning Dear ImGui..."
-    git clone --depth=1 https://github.com/ocornut/imgui.git external/imgui
-else
-    echo "ImGui already cloned."
+    git clone --depth=1 https://github.com/ocornut/imgui.git "external/imgui"
+    echo "ImGui fetched into external"
 fi
 
-# ========== Installing boost ====================
-echo "=== All dependencies downloaded now installing boost ==="
-cd external/boost
-./bootstrap.sh --prefix="$(pwd)"
-./b2
-echo "Installation completed..."
+# clone or update GLFW
+if [ ! -d "external/glfw" ]; then
+  git clone https://github.com/glfw/glfw.git "external/glfw"
+fi
+
+# generate CMakeLists.txt for ImGui
+if [ ! -f "external/imgui/CMakeLists.txt" ]; then
+  cat > "external/imgui/CMakeLists.txt" << 'EOF'
+  cmake_minimum_required(VERSION 3.14)
+  project(imgui)
+
+  add_library(imgui
+    imgui.cpp
+    imgui_demo.cpp
+    imgui_draw.cpp
+    imgui_tables.cpp
+    imgui_widgets.cpp
+    backends/imgui_impl_glfw.cpp
+    backends/imgui_impl_opengl3.cpp
+  )
+
+  target_include_directories(imgui PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/backends
+  )
+
+  find_package(OpenGL REQUIRED)
+  target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
+EOF
+fi
+
+echo "=== All dependencies installed ==="

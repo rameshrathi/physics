@@ -1,13 +1,8 @@
 #pragma once
 
 /**
- * UIModule.h
- *
  * Using Apple's built-in OpenGL framework instead of GLAD on macOS.
  * No explicit loader needed: just include <OpenGL/gl3.h> and link to OpenGL.framework.
- * In CMakeLists.txt:
- *   find_library(OpenGL_FRAMEWORK OpenGL)
- *   target_link_libraries(my_app PRIVATE imgui glfw ${OpenGL_FRAMEWORK})
  */
 
 #include <iostream>
