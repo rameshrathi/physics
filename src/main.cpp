@@ -14,11 +14,13 @@ namespace stock {
         double price{};
     };
     // Example stock ticker parser
-    struct BuildTicker final {
-        static Ticker build(const json::value& json) {
-            Ticker tk;
-            tk.symbol = json.at("symbol").as_string();
-            return tk;
+    struct TickerParser final : IParser<Ticker> {
+        Ticker operator()(const std::string& msg) const override {
+            Ticker ticker;
+            json::value parsed = json::parse(msg);
+            ticker.symbol = parsed.at("symbol").as_string();
+            ticker.price = parsed.at("price").as_double();
+            return ticker;
         }
     };
 } // stock
@@ -30,10 +32,6 @@ int main() {
 
     const auto client = std::make_shared<WSClient>(ioc, ctx);
 
-    // Install JSON parser
-    const auto parser = std::make_shared<JSONParser>();
-    client->set_json_parser<JSONParser>(parser);
-
     // Callbacks
     client->set_on_connected([]{
         std::cout << "[Connected]" << std::endl;
@@ -43,8 +41,9 @@ int main() {
         std::cout << "[Raw  incoming] " << raw << std::endl;
     });
 
-    client->set_on_parsed([](const std::string& raw, const json::value& parsed){
-        std::cout << "[Parsed incoming] " << parsed << std::endl;
+    const stock::TickerParser parser;
+    client->set_parser<stock::Ticker>(parser, [](const stock::Ticker& ticker) {
+        std::cout << "[Parsed outgoing] " << ticker.symbol << " " << ticker.price << std::endl;
     });
 
     client->set_on_error([](const std::string& err){
@@ -52,7 +51,7 @@ int main() {
     });
 
     // Connect to
-    client->connect("echo.websocket.events", "443");
+    client->connect("localhost", "8765");
 
     // Once connected, send a JSON message
     client->set_on_connected([&]{

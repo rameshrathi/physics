@@ -15,7 +15,9 @@ namespace  json = boost::json;
 
 WSClient::WSClient(net::io_context& ioc, ssl::context& ctx)
     : resolver_(net::make_strand(ioc)),
-    ws_(net::make_strand(ioc), ctx)
+    ws_(net::make_strand(ioc), ctx),
+    connect_delay_(0),
+    send_delay_(0)
     {}
 
 void WSClient::connect(
@@ -38,7 +40,7 @@ void WSClient::do_resolve() {
         );
 }
 
-void WSClient::on_resolve(beast::error_code ec, tcp::resolver::results_type results) {
+void WSClient::on_resolve(beast::error_code ec, const tcp::resolver::results_type& results) {
     if (ec) {
         if (connect_retries_++ < max_connect_retries_) {
             std::this_thread::sleep_for(connect_delay_);
@@ -115,21 +117,6 @@ void WSClient::on_write(beast::error_code ec, std::size_t) {
         );
 }
 
-// Parsing logic
-template <typename T>
-class ParserWrapper : public WSClient::ParserBase {
-    const IParser<T>& parser;
-    std::function<void(const T&)> callback;
-public:
-    ParserWrapper(const IParser<T>& p, std::function<void(const T&)> cb)
-        : parser(p), callback(std::move(cb)) {}
-
-    void parseAndCallback(const std::string& msg) const override {
-        T obj = parser(msg);
-        callback(obj);
-    }
-};
-
 void WSClient::on_read(beast::error_code ec, std::size_t) {
     if (ec)
         return fail(ec, "read");
@@ -158,8 +145,6 @@ void WSClient::on_close(beast::error_code ec) const {
     if (ec) fail(ec, "close");
 }
 
-template <typename T>
-void WSClient::set_parser(const IParser<T>& parser, std::function<void(const T&)> onParsed) { parser_handler_ = std::make_unique<ParserWrapper<T>>(parser, std::move(onParsed)); }
 void WSClient::set_on_message(OnMessageCallback cb)   { on_message_   = std::move(cb); }
 void WSClient::set_on_connected(OnConnectedCallback cb) { on_connected_ = std::move(cb); }
 void WSClient::set_on_error(OnErrorCallback cb)       { on_error_     = std::move(cb); }

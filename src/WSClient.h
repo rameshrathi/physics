@@ -61,10 +61,25 @@ public:
         virtual void parseAndCallback(const std::string& msg) const = 0;
         virtual ~ParserBase() = default;
     };
-
-    // Set parser and callback
+    // wrapper
     template <typename T>
-    void set_parser(const IParser<T>& parser, std::function<void(const T&)> onParsed);
+    class ParserWrapper final : public WSClient::ParserBase {
+        const IParser<T>& parser;
+        std::function<void(const T&)> callback;
+    public:
+        ParserWrapper(const IParser<T>& p, std::function<void(const T&)> cb)
+            : parser(p), callback(std::move(cb)) {}
+
+        void parseAndCallback(const std::string& msg) const override {
+            T obj = parser(msg);
+            callback(obj);
+        }
+    };
+
+    template <typename T>
+    void set_parser(const IParser<T>& parser, std::function<void(const T&)> onParsed) {
+        parser_handler_ = std::make_unique<ParserWrapper<T>>(parser, std::move(onParsed));
+    }
 
     // Callback setters
     void set_on_message(OnMessageCallback cb);
@@ -97,7 +112,7 @@ private:
 
     // Internal steps
     void do_resolve();
-    void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
+    void on_resolve(beast::error_code ec, const tcp::resolver::results_type& results);
     void on_connect(beast::error_code ec, tcp::resolver::results_type::endpoint_type endpoint);
     void on_ssl_handshake(beast::error_code ec);
     void on_ws_handshake(beast::error_code ec);
