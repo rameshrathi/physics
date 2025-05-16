@@ -90,14 +90,16 @@ private:
     // Networking members
     tcp::resolver                                   resolver_;
     websocket::stream<beast::ssl_stream<tcp::socket>> ws_;
-    beast::flat_buffer                              buffer_;
     std::string                                     host_;
     std::string                                     port_;
 
+    beast::flat_buffer                              read_buffer_;
+    beast::flat_buffer                              write_buffer_;
+
     // Retry settings
-    bool                                             is_writing_;
-    int                                              connect_retry_count_;
-    int                                              send_retry_count_;
+    std::atomic<bool>                               is_writing_;
+    int                                             connect_retry_count_;
+    int                                             send_retry_count_;
 
     // Callbacks
     OnMessageCallback     on_message_;
@@ -113,6 +115,7 @@ private:
     void on_connect(beast::error_code ec, tcp::resolver::results_type::endpoint_type endpoint);
     void on_ssl_handshake(beast::error_code ec);
     void on_ws_handshake(beast::error_code ec);
+    void resend_message();
     void on_write(beast::error_code ec, std::size_t bytes_transferred);
     void on_read(beast::error_code ec, std::size_t bytes_transferred);
     void on_close(beast::error_code ec) const;

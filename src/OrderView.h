@@ -7,6 +7,9 @@
  * Right panel: output parameters display (Expected Slippage, Fees, Market Impact, Net Cost, Maker/Taker Proportion, Internal Latency)
  * UI scaled by 30% to increase font and widget sizes.
  */
+#ifdef __APPLE__
+#define GL_SILENCE_DEPRECATION
+#endif
 
 #include <stdexcept>
 #include <cstdio>
@@ -30,7 +33,7 @@ public:
 #ifdef __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-        window = glfwCreateWindow(800, 600, "OrderView", nullptr, nullptr);
+        window = glfwCreateWindow(1024, 1024, "OrderView", nullptr, nullptr);
         if (!window) {
             glfwTerminate();
             throw std::runtime_error("Failed to create GLFW window");

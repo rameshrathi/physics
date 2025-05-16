@@ -6,6 +6,10 @@
  * Layout optimized for chart and orderbook display with responsive design.
  */
 
+#ifdef __APPLE__
+#define GL_SILENCE_DEPRECATION
+#endif
+
 #include <string>
 #include <vector>
 #include <stdexcept>
@@ -178,14 +182,28 @@ public:
         ImGui::Text("%s/USD Price History",config.spotAsset.c_str());
         ImGui::PopFont(); ImGui::Separator();
         static float hist[100]; static bool init=false;
-        if(!init){ float base=calc.getBids().empty()?10000:calc.getBids()[0].first; hist[0]=base;
-            for(int i=1;i<100;i++){ hist[i]=hist[i-1]+(((float)rand()/RAND_MAX-0.48f)*base*0.01f);} init=true; }
-        float minP=hist[0],maxP=hist[0]; for(int i=1;i<100;i++){minP=std::min(minP,hist[i]);maxP=std::max(maxP,hist[i]);}
+        if(!init){
+            float base=calc.getBids().empty()?10000:calc.getBids()[0].first; hist[0]=base;
+            for(int i=1;i<100;i++) {
+                hist[i] = hist[i-1]+((static_cast<float>(rand())/RAND_MAX-0.48f)*base*0.01f);
+            }
+            init = true;
+        }
+        float minP=hist[0],maxP=hist[0]; for(int i=1;i<100;i++) {
+            minP=std::min(minP,hist[i]);maxP=std::max(maxP,hist[i]);
+        }
         float pad=(maxP-minP)*0.05f; minP-=pad; maxP+=pad;
-        ImVec2 avail=ImGui::GetContentRegionAvail(); ImVec2 canvas(avail.x,avail.y-ImGui::GetTextLineHeightWithSpacing());
-        ImVec2 pos=ImGui::GetCursorScreenPos(); auto draw=ImGui::GetWindowDrawList();
-        draw->AddRect(pos, ImVec2(pos.x + canvas.x, pos.y + canvas.y), ImColor(style.Colors[ImGuiCol_Border]));
-        const int div=4; for(int i=0;i<=div;i++){float y=pos.y+i*canvas.y/div; char buf[32]; sprintf(buf,"$%.2f",maxP - i*(maxP-minP)/div);
+        ImVec2 avail=ImGui::GetContentRegionAvail();
+        ImVec2 canvas(avail.x,avail.y-ImGui::GetTextLineHeightWithSpacing());
+        ImVec2 pos=ImGui::GetCursorScreenPos();
+        auto draw=ImGui::GetWindowDrawList();
+        draw->AddRect(
+            pos, ImVec2(pos.x + canvas.x, pos.y + canvas.y),
+            ImColor(style.Colors[ImGuiCol_Border])
+            );
+        const int div=4; for(int i=0;i<=div;i++) {
+            float y=pos.y+i*canvas.y/div; char buf[32];
+            snprintf(buf, 32, "$%.2f",maxP - i*(maxP-minP)/div);
             draw->AddLine(ImVec2(pos.x,y),ImVec2(pos.x+canvas.x,y),ImColor(0.5f,0.5f,0.5f,0.25f));
             draw->AddText(ImGui::GetFont(),ImGui::GetFontSize(),ImVec2(pos.x+5,y-10),ImColor(0.8f,0.8f,0.8f,1.0f),buf);
         }
