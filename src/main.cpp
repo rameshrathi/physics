@@ -48,15 +48,6 @@ int main() {
     // Connect to
     client->connect("localhost", "8765");
 
-    // Once connected, send a JSON message
-    client->set_on_connected([&]{
-        json::value msg = {
-            {"type", "greeting"},
-            {"payload", "Hello, secure echo!"}
-        };
-        client->send("Hello From Client!");
-    });
-
     ioc.run();
     return 0;
 }
