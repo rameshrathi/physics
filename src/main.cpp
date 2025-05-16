@@ -6,7 +6,7 @@
 #include "WSClient.h"
 #include "CalculationEngine.h"
 #include "OrderBook.h"
-#include "TradingView.h"
+#include "MarketView.h"
 
 namespace  json = boost::json;
 
@@ -20,7 +20,7 @@ int main() {
     Config config;
     stock::Orderbook ob;
     CalculationEngine calc(config);
-    TradingView ui(config, calc);
+    MarketView ui(config, calc);
     ui.setup();
 
     // Callbacks
