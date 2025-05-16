@@ -71,7 +71,7 @@ public:
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
 
         io.FontDefault = io.Fonts->AddFontDefault();
-        const char* path = "fonts/Roboto-Regular.ttf";
+        const char* path = "./fonts/Roboto-Regular.ttf";
         if (FILE* f = fopen(path, "r")) {
             float baseSize = 18.0f;
             fclose(f);
