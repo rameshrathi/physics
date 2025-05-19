@@ -7,7 +7,6 @@
 #include <initializer_list>
 
 namespace RK {
-    //----------------------------------------------------------
 
 template<typename ValueType>
 class Array {

@@ -8,7 +8,8 @@ add_two_values(T first, T second) {
 }
 
 template <typename T>
-T add_values(T first, T second) {
+std::enable_if_t<std::is_arithmetic<T>::value, T>
+add_values(T first, T second) {
   return first + second;
 }
 
