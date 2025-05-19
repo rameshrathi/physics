@@ -1,8 +1,8 @@
 node_modules/
 build/
 dist/
-idea/
-obj/
+.idea/
+.vscode/
 .log
 .DS_Store
 .elf
