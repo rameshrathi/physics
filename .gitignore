@@ -1,12 +1,11 @@
 node_modules/
 build/
 dist/
-*.log
+idea/
+obj/
+.log
 .DS_Store
 .elf
 .bin
 .o
 .swiftpm
-bin
-obj
-main

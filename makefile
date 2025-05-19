@@ -2,7 +2,7 @@
 
 # Compiler and flags
 CXX := g++
-CXXFLAGS := -std=c++17 -Wall -Werror -I./LibRK -I./src
+CXXFLAGS := -std=c++17 -Wall -g -I./LibRK -I./src
 AR := ar
 ARFLAGS := rcs
 
