@@ -1,21 +1,19 @@
 #include <iostream>
+#include <type_traits>
 
-// calculating factorial at compile-time
-template <int N> struct Factorial
-{
-    static const int value = N * Factorial<N - 1>::value;
-};
+template <typename T>
+std::enable_if_t<std::is_arithmetic<T>::value>
+add_two_values(T first, T second) {
+    std::cout << "SUM = " << first + second << std::endl;
+}
 
-// base case (Factorial<0>)
-template <> struct Factorial<0>
-{
-    static constexpr int value = 1;
-};
+template <typename T>
+T add_values(T first, T second) {
+  return first + second;
+}
 
 int main()
 {
-    // Factorial computation
-    // happens at compile-time
-    std::cout << "Factorial of 5 is: " << Factorial<5>::value;
+    std::cout << "Result : " << add_values(100, 200)  << std::endl;
     return 0;
 }

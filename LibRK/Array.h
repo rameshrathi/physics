@@ -20,7 +20,7 @@ public:
     size_t size() const { return _size; }
 
     Array(const Array& other) {
-        size_t size = other._size;
+        const size_t size = other._size;
         _values = new ValueType[size];
         _size = size;
         memcpy(_values, other._values, _size * sizeof(ValueType));
@@ -28,7 +28,7 @@ public:
 
     Array& operator=(const Array& other) {
         if (this != &other) {
-            size_t size = other._size;
+            const size_t size = other._size;
             delete[] _values;
             _values = new ValueType[size];
             _size = size;
@@ -41,6 +41,5 @@ private:
     ValueType *_values;
     size_t _size;
 };
-
 
 } // RK Namespace
