@@ -1,2 +1,0 @@
-/usr/bin/ar qc libFS.a CMakeFiles/FS.dir/FileSystem.cpp.o
-/usr/bin/ranlib libFS.a
