@@ -4,7 +4,11 @@
 
 #pragma once
 
-class String {
+#include <RK/Types.h>
+#include <RK/Array.h>
 
-};
+namespace RK {
 
+    typedef Array<Char> String;
+
+} // RK

@@ -1,17 +1,20 @@
 // LAB/main.cpp
+
 #include <iostream>
-#include <string>
-#include <FS/FileSystem.h>
+#include <RK/Array.h>
+#include <RK/String.h>
 
 int main(int argc, char *argv[])
 {
-
     using namespace std;
 
-    cout << "This is executable file";
+    const Array<Float32> arr = { 65, 66, 67, 68, 69 };
+    cout << "Array = " << arr << endl;
+
+    const RK::String s = { 'R', 'A', 'M', 'E', 'S', 'H', '\0' };
+    cout << "String = " << s << endl;
 
     cout << "\n";
-
     return 0;
 
 }
