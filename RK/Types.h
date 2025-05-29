@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cinttypes>
 
 // Unsigned
 using UInt8 = unsigned char;
@@ -27,6 +28,7 @@ using Bool = bool;
 
 // Char
 using Char = char;
+using UChar = unsigned char;
 
 // Size
 using Size = size_t;

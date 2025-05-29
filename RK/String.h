@@ -43,16 +43,24 @@ public:
     String (const String& other) {
         _data = new T[other._size];
         _size = other._size;
-        memcpy(_data, other._data, _size * sizeof(T));
+        Size i = 0;
+        for (const T & item : other) {
+            _data[i++] = item;
+        }
+        // memcpy(_data, other._data, _size * sizeof(T));
     }
     String& operator = (const String& other) {
         if (this == &other) {
             return *this;
         }
         T *newData = new T[other._size];
+        delete [] _data;
         _size = other._size;
-        memcpy(newData, other._data, other._size * sizeof(T));
         _data = newData;
+        Size i = 0;
+        for (const T & item : other) {
+            _data[i++] = item;
+        }
         return *this;
     }
 
@@ -90,7 +98,7 @@ public:
     // Output stream
     friend std::ostream& operator << (std::ostream& os, const String& array) {
         for (Size i = 0; i < array._size; i++) {
-            os << array._data[i] << " ";
+            os << array._data[i];
         }
         return os;
     }

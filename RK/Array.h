@@ -31,15 +31,19 @@ public:
     Array (const Array& other) {
         _data = new T[other._size];
         _size = other._size;
-        memcpy(_data, other._data, _size * sizeof(T));
+        Size i = 0;
+        for (const T & item : other)
+            _data[i++] = item;
     }
     Array& operator = (const Array& other) {
         if (this == &other) {
             return *this;
         }
         T *newData = new T[other._size];
+        delete[] _data;
+
         _size = other._size;
-        memcpy(newData, other._data, other._size * sizeof(T));
+        std::copy(other.begin(), other.end(), newData);
         _data = newData;
         return *this;
     }
@@ -55,6 +59,7 @@ public:
         if (this == &other) {
             return *this;
         }
+        delete [] _data;
         _data = other._data;
         _size = other._size;
         other._data = nullptr;
@@ -77,8 +82,8 @@ public:
 
     // Output stream
     friend std::ostream& operator << (std::ostream& os, const Array& array) {
-        for (Size i = 0; i < array._size; i++) {
-            os << array._data[i] << " ";
+        for (Size i = 0; i < array.size(); i++) {
+            os << array[i];
         }
         return os;
     }

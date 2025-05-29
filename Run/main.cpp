@@ -11,11 +11,13 @@ int main(int argc, char *argv[])
     using namespace std;
 
     const Array<Float32> arr = { 65, 66, 67, 68, 69 };
+    arr[4] = 70;
     cout << "Array = " << arr << endl;
 
     assert(arr.size() == 5);
 
     const RK::String s = "Ramesh Kumar";
+    arr[7] = '_';
     cout << "String = " << s << endl;
 
     assert(s.size() == 12);
