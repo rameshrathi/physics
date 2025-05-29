@@ -1,6 +1,9 @@
 node_modules/
 build/
 dist/
+build
+cmake-build-debug
+.idea
 *.log
 .DS_Store
 .elf
