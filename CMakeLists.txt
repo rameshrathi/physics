@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(Lab, CXX)
+project(Lab CXX)
 
 # Standard
 set(CXX_STANDARD 20)

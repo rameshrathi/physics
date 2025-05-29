@@ -9,8 +9,7 @@
 #include <vector>
 
 namespace FS {
-    // Start of FS
-
+    // Struct for inode
     struct Inode {
         ino_t ino;      // Inode No
         mode_t mode;    // File type and permissions

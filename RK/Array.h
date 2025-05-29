@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <iosfwd>
+#include <iostream>
 #include <initializer_list>
 #include <RK/Types.h>
 
@@ -42,8 +42,10 @@ public:
         T *newData = new T[other._size];
         delete[] _data;
 
+        for (Size i = 0; i < other._size; i++) {
+            newData[i] = other._data[i];
+        }
         _size = other._size;
-        std::copy(other.begin(), other.end(), newData);
         _data = newData;
         return *this;
     }

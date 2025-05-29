@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <cinttypes>
+#include <unistd.h>
 
 // Unsigned
 using UInt8 = unsigned char;
@@ -32,4 +33,3 @@ using UChar = unsigned char;
 
 // Size
 using Size = size_t;
-

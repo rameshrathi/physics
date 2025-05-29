@@ -8,7 +8,6 @@
 #include <RK/Array.h>
 
 namespace RK {
-
 namespace impl {
 
 // String
@@ -31,7 +30,7 @@ public:
     }
 
     String(const std::initializer_list<T> & list) {
-        _data = new T[list.size()];
+        _data = new T[list.size()+1];
         _size = list.size();
         Size index = 0;
         for (const T & item : list) {
@@ -41,21 +40,20 @@ public:
 
     // Copy
     String (const String& other) {
-        _data = new T[other._size];
-        _size = other._size;
+        _data = new T[other.size() + 1];
+        _size = other.size();
         Size i = 0;
         for (const T & item : other) {
             _data[i++] = item;
         }
-        // memcpy(_data, other._data, _size * sizeof(T));
     }
     String& operator = (const String& other) {
         if (this == &other) {
             return *this;
         }
-        T *newData = new T[other._size];
+        T *newData = new T[other.size() + 1];
         delete [] _data;
-        _size = other._size;
+        _size = other.size();
         _data = newData;
         Size i = 0;
         for (const T & item : other) {

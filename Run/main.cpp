@@ -1,26 +1,18 @@
 // LAB/main.cpp
 
-#include <iostream>
+#include <RK/Types.h>
 #include <RK/Array.h>
 #include <RK/String.h>
 
+#include <iostream>
 #include <assert.h>
 
 int main(int argc, char *argv[])
 {
     using namespace std;
 
-    const Array<Float32> arr = { 65, 66, 67, 68, 69 };
-    arr[4] = 70;
-    cout << "Array = " << arr << endl;
-
-    assert(arr.size() == 5);
-
-    const RK::String s = "Ramesh Kumar";
-    arr[7] = '_';
-    cout << "String = " << s << endl;
-
-    assert(s.size() == 12);
+    cout << "Size of UInt32 : " << sizeof(UInt32) << "\n";
+    cout << "Size of UInt64 : " << sizeof(UInt64) << "\n";
 
     cout << "\n";
     return 0;
