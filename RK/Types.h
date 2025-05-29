@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 // Unsigned
 using UInt8 = unsigned char;
 using UInt16 = unsigned short;
