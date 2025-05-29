@@ -7,5 +7,5 @@ set(CXX_STANDARD_REQUIRED ON)
 
 # Folders
 add_subdirectory(FS)
-add_subdirectory(Main)
+add_subdirectory(LAB)
 add_subdirectory(Tests)
