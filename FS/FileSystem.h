@@ -1,43 +1,9 @@
 #pragma once
 
-#include <cinttypes>
-#include <string>
-#include <vector>
+#include <FS/CommonTypes.h>
+#include <FS/Inode.h>
 
 namespace FS { // Start of FS
-
-using ino_t = uint64_t;
-using mode_t = uint32_t;
-using nlink_t = uint16_t;
-
-using UChar = unsigned char;
-
-struct ExAttrs {
-    std::string name;
-    std::string value;
-};
-
-struct INode {
-    ino_t ino;      // Inode No
-    mode_t mode;    // File type and permissions
-    uid_t uid;      // Owner user Id
-    gid_t gid;      // Owner Group Id
-    nlink_t nlink;
-    off_t size;
-    time_t atime;
-    time_t mtime;
-    time_t ctime;
-    blkcnt_t blocks;
-
-    // External attributes
-    std::vector<ExAttrs> ex_attrs;
-
-    // Block pointers (for data storage)
-    uint32_t direct_blocks[12];   // Direct block pointers
-    uint32_t indirect_block;      // Single indirect
-    uint32_t double_indirect;     // Doubly indirect
-    uint32_t triple_indirect;     // Triple indirect
-};
 
 struct FileInfo {
     std::string name;
@@ -51,8 +17,8 @@ struct FileInfo {
 struct Dirent {
     ino_t ino;                    // Inode number
     off_t offset;                 // Offset in dir
-    unsigned short record_len;        // Record length
-    UChar type;           // File type
+    unsigned short record_len;    // Record length
+    UChar type;                   // File type
     char name[];                  // Filename (variable length)
 };
 
@@ -102,11 +68,11 @@ struct JournalEntry {
 
 // In-memory file structure (enhanced)
 struct File {
-    struct INode inode;           // Inode data
-    char *name;                   // Filename
-    struct myfs_file *parent;     // Parent directory
-    struct myfs_file *children;   // Child files (for directories)
-    struct myfs_file *next;       // Next sibling
+    Inode inode;                    // Inode data
+    char *name;                     // Filename
+    File *parent;                   // Parent directory
+    File *children;                 // Child files (for directories)
+    File *next;                     // Next sibling
 
     // Caching and performance
     void *cache;                  // File data cache
@@ -139,21 +105,21 @@ static inline void set_bit(void *bitmap, int bit) {
 }
 
 static inline void clear_bit(void *bitmap, int bit) {
-    UChar *bytes = (UChar *)bitmap;
+    UChar *bytes = static_cast<UChar *>(bitmap);
     bytes[bit / 8] &= ~(1 << (bit % 8));
 }
 
-    // Hash table for fast filename lookup
+// Hash table for fast filename lookup
 #define HASH_TABLE_SIZE 1024
 
 struct HashEntry {
     char *name;
-    struct myfs_file *file;
-    struct myfs_hash_entry *next;
+    File *file;
+    HashEntry *next;
 };
 
 struct HashTable {
-    struct myfs_hash_entry *buckets[HASH_TABLE_SIZE];
+    HashEntry *buckets[HASH_TABLE_SIZE];
     pthread_mutex_t lock;
 };
 

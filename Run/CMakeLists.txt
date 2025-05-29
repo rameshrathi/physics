@@ -3,18 +3,19 @@ set(MAIN_SOURCES
 )
 
 add_executable(
-    LAB
+    RUN
     ${MAIN_SOURCES}
 )
 
 target_include_directories(
-    LAB
-    PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
+        RUN
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 # Link FS to Executable
 target_link_libraries(
-    LAB
-    PRIVATE FS
+        RUN
+        PRIVATE RK
+        PRIVATE FS
 )

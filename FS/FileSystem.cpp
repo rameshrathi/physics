@@ -87,20 +87,20 @@ static int myfs_fallocate(const char *path, int mode, off_t offset, off_t length
     return 0;
 }
 
-// File system statistics
-static int myfs_statfs(const char *path, struct statvfs *stbuf) {
-    // Return filesystem statistics
-    stbuf->f_bsize = 4096;      // Block size
-    stbuf->f_frsize = 4096;     // Fragment size
-    stbuf->f_blocks = 1000000;  // Total blocks
-    stbuf->f_bfree = 500000;    // Free blocks
-    stbuf->f_bavail = 500000;   // Available blocks
-    stbuf->f_files = 100000;    // Total inodes
-    stbuf->f_ffree = 50000;     // Free inodes
-    stbuf->f_namemax = 255;     // Maximum filename length
-
-    return 0;
-}
+// // File system statistics
+// static int myfs_statfs(const char *path, struct statvfs *stbuf) {
+//     // Return filesystem statistics
+//     stbuf->f_bsize = 4096;      // Block size
+//     stbuf->f_frsize = 4096;     // Fragment size
+//     stbuf->f_blocks = 1000000;  // Total blocks
+//     stbuf->f_bfree = 500000;    // Free blocks
+//     stbuf->f_bavail = 500000;   // Available blocks
+//     stbuf->f_files = 100000;    // Total inodes
+//     stbuf->f_ffree = 50000;     // Free inodes
+//     stbuf->f_namemax = 255;     // Maximum filename length
+//
+//     return 0;
+// }
 
 // Flush cached data
 static int myfs_flush(const char *path, struct fuse_file_info *fi) {

@@ -6,6 +6,7 @@ set(CXX_STANDARD 20)
 set(CXX_STANDARD_REQUIRED ON)
 
 # Folders
+add_subdirectory(RK)
 add_subdirectory(FS)
-add_subdirectory(LAB)
+add_subdirectory(Run)
 add_subdirectory(Tests)

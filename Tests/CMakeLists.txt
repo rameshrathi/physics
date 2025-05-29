@@ -1,3 +1,5 @@
+# Tests/CMakeLists
+
 enable_testing()
 
 file(GLOB TEST_SOURCES *.cpp)
