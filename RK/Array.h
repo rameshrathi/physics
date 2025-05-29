@@ -28,12 +28,12 @@ public:
     }
 
     // Copy
-    Array (const Array<T>& other) {
+    Array (const Array& other) {
         _data = new T[other._size];
         _size = other._size;
         memcpy(_data, other._data, _size * sizeof(T));
     }
-    Array& operator = (const Array<T>& other) {
+    Array& operator = (const Array& other) {
         if (this == &other) {
             return *this;
         }
@@ -45,13 +45,13 @@ public:
     }
 
     // Move
-    Array (Array<T>&& other) noexcept {
+    Array (Array&& other) noexcept {
         _data = other._data;
         _size = other._size;
         other._data = nullptr;
         other._size = 0;
     }
-    Array& operator = (Array<T>&& other) noexcept {
+    Array& operator = (Array&& other) noexcept {
         if (this == &other) {
             return *this;
         }
@@ -76,7 +76,7 @@ public:
     T* end () const noexcept { return _data + _size; }
 
     // Output stream
-    friend std::ostream& operator << (std::ostream& os, const Array<T>& array) {
+    friend std::ostream& operator << (std::ostream& os, const Array& array) {
         for (Size i = 0; i < array._size; i++) {
             os << array._data[i] << " ";
         }
