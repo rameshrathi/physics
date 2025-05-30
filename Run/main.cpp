@@ -1,15 +1,27 @@
 // LAB/main.cpp
-
 #include <RK/Types.h>
 #include <RK/String.h>
 #include <RK/Helpers.h>
-
 #include <iostream>
-#include <cassert>
+#include <ranges>
+#include <type_traits>
+#include <concepts>
 
-template <typename T>
-void show(T & o) {
-    std::cout << "Called" << "\n";
+// Ex1
+template<typename T> requires std::is_floating_point<T>::value
+T absolute(T value) {
+    return value < 0 ? -value : value;
+}
+
+template<typename  C> requires std::is_integral<C>::value
+Size count_(const C& c) {
+    int num = c;
+    int count = 0;
+    while (num > 0) {
+        count++;
+        num /= 10;
+    }
+    return count;
 }
 
 int main(int argc, char *argv[])
@@ -17,20 +29,7 @@ int main(int argc, char *argv[])
     using namespace std;
     using namespace RK;
 
-    cout << "Size of UInt32 : " << sizeof(UInt32) << "\n";
-    cout << "Size of UInt64 : " << sizeof(UInt64) << "\n";
-
-    String s1 = "X1";
-    String s2 = "X2";
-
-    cout << "S1 : " << s1 << "\n";
-    cout << "S2 : " << s2 << "\n";
-    RK::swap(s1, s2);
-    cout << "S1 : " << s1 << "\n";
-    cout << "S2 : " << s2 << "\n";
-
-    assert(s1 == "X2");
-    assert(s2 == "X1");
+    cout << "COUNT : " << count_(123456789) << endl;
 
     cout << "\n";
     return 0;
