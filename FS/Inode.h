@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <RK/Types.h>
 #include <FS/CommonTypes.h>
 
 #include <vector>

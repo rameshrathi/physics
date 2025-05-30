@@ -1,10 +1,8 @@
 # RK/CMakeLists
 
 file(GLOB RK_SOURCES
-        AtomicRefCount.cpp
         Atomic.cpp
-        Helpers.cpp
-        String.cpp
+        AtomicRefCount.cpp
 )
 
 add_library(RK

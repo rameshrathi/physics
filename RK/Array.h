@@ -82,8 +82,22 @@ public:
     T* begin () const noexcept { return _data; }
     T* end () const noexcept { return _data + _size; }
 
+    // Compare
+    Bool operator == (const Array& other) const noexcept {
+        if (this == &other) { return true; }
+        if (_size != other._size) { return false; }
+        for (Size i = 0; i < _size; i++) {
+            if (_data[i] != other._data[i]) { return false; }
+        }
+        return true;
+    }
+    // Not compare
+    Bool operator != (const Array& other) const noexcept {
+        return !(*this == other);
+    }
+
     // Output stream
-    std::ostream& operator << (std::ostream& os, const Array& array) {
+    friend std::ostream& operator << (std::ostream& os, const Array& array) {
         for (Size i = 0; i < array.size(); i++) {
             os << array[i];
         }
