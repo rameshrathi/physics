@@ -35,8 +35,13 @@ run() {
   "$ELF_FILE"
 }
 
+clear() {
+  echo "removing build files..."
+  rm -rf "$BUILD_DIR"
+}
+
 usage() {
-	echo "Usage : $0 { build | test | run }"
+	echo "Usage : $0 < build | test | run | clean >"
 	exit 1
 }
 
@@ -44,8 +49,13 @@ main() {
 	[[ $# -eq 0 ]] && usage
 	case "$1" in
 	build) build;;
+  b) build;;
 	test) test;;
+  t) test;;
 	run) run;;
+  r) run;;
+  clear) clear;;
+  c) clear;;
 	*) usage;;
 	esac
 }
