@@ -5,7 +5,7 @@
 #pragma once
 
 #include <RK/Types.h>
-#include <ostream>
+#include <RK/Helpers.h>
 #include <initializer_list>
 #include <type_traits>
 
@@ -22,7 +22,7 @@ struct StringImpl {
     StringImpl () = default;
 
     StringImpl(const char* str) {
-        const Size len = strlen(str);
+        const Size len = str_length(str);
         _data = new ValType[len+1];
         _size = len;
         for (Size index = 0; index < len; index++ ) {
@@ -78,10 +78,12 @@ struct StringImpl {
 
     /* --------------------------------------------------------- */
     Size size () const noexcept { return _size; }
-    const ValType& value() const { return _data; }
+    const ValType* value() const { return _data; }
 
     ValType& operator[] (Size index) const noexcept { return _data[index]; }
     void resize (const Size size) noexcept { _size = size; }
+
+    ValType& operator[] (Size index) noexcept { return _data[index]; }
 
     // ---------  Iterators ----------------
     const ValType& begin () const noexcept { return _data; }
@@ -91,7 +93,14 @@ struct StringImpl {
     template<typename U = ValType>
     std::enable_if_t<std::is_same<U, Char>::value, Bool>
     operator == ( const char *str ) const {
-        return std::strcmp(_data, str) == 0;
+        return RK::str_compare(_data, str) == 0;
+    }
+
+    // Compare if ValType = Char
+    template<typename U = ValType>
+    std::enable_if_t<std::is_same<U, Char>::value, Bool>
+    operator == ( const StringImpl & other ) const {
+        return RK::str_compare(_data, other._data) == 0;
     }
 
     // Output stream
@@ -106,7 +115,7 @@ struct StringImpl {
 
 private:
     /* ---------  DATA  --------- */
-    T *_data = nullptr;
+    ValType *_data = nullptr;
     Size _size = 0;
 };
 
