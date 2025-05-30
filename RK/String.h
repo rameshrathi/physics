@@ -22,14 +22,14 @@ public:
 
     String () = default;
 
-    String(const char * str);
+    String(const char* str);
+    String(const std::initializer_list<T>& list);
 
-    String(const std::initializer_list<T> & list);
     String (const String& other);
     String (String&& other) noexcept;
 
-    String& operator = (const String& other);
-    String& operator = (String&& other) noexcept;
+    // String& operator = (const String& other);
+    // String& operator = (String&& other) noexcept;
 
     /* --------------------------------------------------------- */
     Size size () const noexcept { return _size; }
@@ -50,7 +50,7 @@ public:
     }
 
     // Output stream
-    friend std::ostream&  operator << (std::ostream& os, const String& array);
+    // friend std::ostream&  operator << (std::ostream& os, const String& array);
 
 private:
     T *_data = nullptr;

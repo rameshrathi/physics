@@ -2,15 +2,17 @@
 // Created by ramesh on 30/05/25.
 //
 
-#ifndef ATOMIC_H
-#define ATOMIC_H
+#pragma once
 
+#include <atomic>
 
+template <class T>
+class Atomic
+{
+public:
+    ~Atomic() = default;
 
-class Atomic {
-
+    explicit Atomic(T value) : _value(value) {}
+private:
+    std::atomic<T> _value;
 };
-
-
-
-#endif //ATOMIC_H

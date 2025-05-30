@@ -1,6 +1,5 @@
 file(GLOB FS_SOURCES
     FileSystem.cpp
-    FileSystem.h
 )
 
 add_library(

@@ -83,7 +83,7 @@ public:
     T* end () const noexcept { return _data + _size; }
 
     // Output stream
-    friend std::ostream& operator << (std::ostream& os, const Array& array) {
+    std::ostream& operator << (std::ostream& os, const Array& array) {
         for (Size i = 0; i < array.size(); i++) {
             os << array[i];
         }

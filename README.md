@@ -1,10 +1,8 @@
-Implementing a Simple Unix-Like File System in C++
-This guide walks through building a minimal Unix-like file system using C++ and OOP. We cover the on-disk layout, key classes (Superblock, Inode, DirectoryEntry, BlockManager, FileSystem), how data is stored on a USB/block device, raw I/O in C++, basic file/directory operations (mount, create, read, write, delete), format/mount utilities, using an actual USB, and writing GoogleTest unit/integration tests. All steps are explained in detail with code snippets and references to authoritative sources.
-Disk Structure Layout
-A typical Unix file system divides a partition into several regions
-web.cs.wpi.edu
-web.cs.wpi.edu
-. For example:
+# A typical Unix file system divides a partition into several regions
+-------------------------------------------
+[web.cs.wpi.edu](web.cs.wpi.edu)
+
+#### -* For example:
 Boot block (block 0): May contain bootloader code or boot record. It is usually the very first sector(s) of the partition
 web.cs.wpi.edu
 .

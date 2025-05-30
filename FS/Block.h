@@ -43,10 +43,10 @@ struct SuperBlock {
     UInt32 inode_bitmap_block;  // Inode bitmap location
     time_t mount_time;            // Last mount time
     time_t write_time;            // Last write time
-    uint16_t mount_count;         // Mount count
-    uint16_t max_mount_count;     // Maximum mount count
-    uint16_t state;               // Filesystem state
-    uint32_t checksum;            // Superblock checksum
+    UInt16 mount_count;         // Mount count
+    UInt16 max_mount_count;     // Maximum mount count
+    UInt16 state;               // Filesystem state
+    UInt32 checksum;            // Superblock checksum
 };
 
 // Block group descriptor (for large filesystems)
@@ -73,12 +73,12 @@ struct JournalEntry {
 };
 
 // In-memory file structure (enhanced)
-struct File {
+struct FileNode {
     Inode inode;                    // Inode data
     char *name;                     // Filename
-    File *parent;                   // Parent directory
-    File *children;                 // Child files (for directories)
-    File *next;                     // Next sibling
+    FileNode *parent;                   // Parent directory
+    FileNode *children;                 // Child files (for directories)
+    FileNode *next;                     // Next sibling
 
     // Caching and performance
     void *cache;                  // File data cache
@@ -120,7 +120,7 @@ static inline void clear_bit(void *bitmap, int bit) {
 
 struct HashEntry {
     char *name;
-    File *file;
+    FileNode *file;
     HashEntry *next;
 };
 

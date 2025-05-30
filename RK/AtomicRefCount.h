@@ -4,32 +4,18 @@
 
 #pragma once
 
-namespace LIB
-{
-    template<typename T>
-    static inline T atomic_exchange(T volatile* var, T desired, MemoryOrder order = memory_order_seq_cst) noexcept
-    {
-        return __atomic_exchange_n(var, desired, order);
-    }
-
-    template<typename T, typename V = RemoveVolatile<T>>
-    static inline V* atomic_exchange(T volatile** var, V* desired, MemoryOrder order = memory_order_seq_cst) noexcept
-    {
-        return __atomic_exchange_n(var, desired, order);
-    }
-
-    template<typename T, typename V = RemoveVolatile<T>>
-    static inline V* atomic_exchange(T volatile** var, nullptr_t, MemoryOrder order = memory_order_seq_cst) noexcept
-    {
-        return __atomic_exchange_n(const_cast<V**>(var), nullptr, order);
-    }
-} // Lib
+#include <RK/Types.h>
+#include <RK/Atomic.h>
 
 template<typename T>
-class AtomicRefCount {
+class AtomicRefCounted : public Atomic<T> {
 public:
-    AtomicRefCount() = default;
-    ~AtomicRefCount() = default;
+    ~AtomicRefCounted() = default;
+
+    explicit AtomicRefCounted(T value) : Atomic<T>(value) {};
+
+    UInt32 refCount() const noexcept { return _ref_count; }
 
 private:
+    UInt32 _ref_count = 0;
 };

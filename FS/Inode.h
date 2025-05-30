@@ -11,10 +11,10 @@
 namespace FS {
     // Struct for inode
     struct Inode {
-        ino_t ino;      // Inode No
-        mode_t mode;    // File type and permissions
-        uid_t uid;      // Owner user Id
-        gid_t gid;      // Owner Group Id
+        UInt64 ino_num;      // Inode No
+        UInt32 mode;    // File type and permissions
+        uid_t user_id;      // Owner user Id
+        gid_t group_id;      // Owner Group Id
         nlink_t nlink;
         off_t size;
         time_t atime;

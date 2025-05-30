@@ -46,39 +46,39 @@ String<T> :: String (String&& other) noexcept {
     other._size = 0;
 }
 
-template <typename T>
-typename String<T> :: String & operator = (const String<T> & other) {
-    if (this == &other) {
-        return *this;
-    }
-    T *newData = new T[other.size() + 1];
-    delete [] _data;
-    _size = other.size();
-    _data = newData;
-    Size i = 0;
-    for (const T & item : other) {
-        _data[i++] = item;
-    }
-    return *this;
-}
-
-String& operator = (String&& other) noexcept {
-    if (this == &other) {
-        return *this;
-    }
-    _data = other._data;
-    _size = other._size;
-    other._data = nullptr;
-    other._size = 0;
-    return *this;
-}
-
-template <typename T>
-std::ostream& String<T> :: operator << (std::ostream& os, const String& array) {
-    for (Size i = 0; i < array.size(); i++) {
-        os << array[i];
-    }
-    return os;
-}
+// template <typename T>
+// typename String<T> :: String & operator = (const String<T> & other) {
+//     if (this == &other) {
+//         return *this;
+//     }
+//     T *newData = new T[other.size() + 1];
+//     delete [] _data;
+//     _size = other.size();
+//     _data = newData;
+//     Size i = 0;
+//     for (const T & item : other) {
+//         _data[i++] = item;
+//     }
+//     return *this;
+// }
+//
+// String& operator = (String&& other) noexcept {
+//     if (this == &other) {
+//         return *this;
+//     }
+//     _data = other._data;
+//     _size = other._size;
+//     other._data = nullptr;
+//     other._size = 0;
+//     return *this;
+// }
+//
+// template <typename T>
+// std::ostream& String<T> :: operator << (std::ostream& os, const String& array) {
+//     for (Size i = 0; i < array.size(); i++) {
+//         os << array[i];
+//     }
+//     return os;
+// }
 
 } // RK::Impl
