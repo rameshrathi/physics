@@ -23,7 +23,7 @@ struct FileInfo {
 struct Dirent {
     ino_t ino;                    // Inode number
     off_t offset;                 // Offset in dir
-    UInt16 record_len;    // Record length
+    UInt16 record_len;    	  // Record length
     UChar type;                   // File type
     Char name[];                  // Filename (variable length)
 };
