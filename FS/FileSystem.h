@@ -1,5 +1,6 @@
 #pragma once
 
+#include <RK/Types.h>
 #include <FS/Block.h>
 #include <FS/Inode.h>
 
@@ -30,6 +31,12 @@ public:
 
     // Utility
     virtual bool exists(const std::string& path) = 0;
+
+    // Size
+    virtual Size totalBlockCount() = 0;
+    virtual Size freeBlockCount() = 0;
+    virtual Size totalInodeCount() = 0;
+    virtual Size freeInodeCount() = 0;
 };
 
 } // End of FS
