@@ -2,7 +2,7 @@
 // Created by ramesh on 30/05/25.
 //
 
-#include <RK/Array.h>
+#include <Shared/Array.h>
 #include <cassert>
 
 int main() {

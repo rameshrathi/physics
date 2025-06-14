@@ -16,6 +16,6 @@ target_include_directories(
 # Link FS to Executable
 target_link_libraries(
         RUN
-        PRIVATE RK
-        PRIVATE FS
+	PRIVATE Shared
+        PRIVATE Physics
 )

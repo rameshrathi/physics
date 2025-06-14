@@ -1,6 +1,6 @@
 // LAB/main.cpp
-#include <RK/Types.h>
-#include <RK/Helpers.h>
+#include <Shared/Types.h>
+#include <Shared/Helpers.h>
 #include <iostream>
 
 int main(int argc, char *argv[])

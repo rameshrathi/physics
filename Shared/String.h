@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <RK/Types.h>
-#include <RK/Helpers.h>
+#include <Shared/Types.h>
+#include <Shared/Helpers.h>
 #include <initializer_list>
 #include <type_traits>
 

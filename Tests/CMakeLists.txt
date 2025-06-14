@@ -1,5 +1,5 @@
 # Tests/CMakeLists
 
 enable_testing()
-add_subdirectory(RKTest)
-add_subdirectory(FSTest)
+add_subdirectory(PhyTest)
+add_subdirectory(SharedTest)

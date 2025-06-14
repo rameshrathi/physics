@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <initializer_list>
-#include <RK/Types.h>
+#include <Shared/Types.h>
 
 template <typename T>
 class Array {
@@ -102,7 +102,7 @@ public:
     Bool operator != (const Array& other) const noexcept {
         if (_size != other._size) return true;
 	bool is_all_equals = true;
-	for (Size i = 0; i <_ size; i++) {
+	for (Size i = 0; i < _size; i++) {
 		if (_data[i] != data[i]) is_all_equals = false;
 	}
 	return !is_all_equals;	
