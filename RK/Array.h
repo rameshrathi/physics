@@ -76,7 +76,14 @@ public:
 
     T* data () const noexcept { return _data; }
 
-    void resize (const Size size) noexcept { _size = size; }
+    void resize (const Size size) {
+      if (size == _size || size < 1) return;
+      T *buffer = new T[size];
+      std::copy(_data, _data+sizeof(T)*std::min(size, _size), buffer);
+      _size = size;
+      delete [] _data;
+      _data = buffer;
+    }
 
     // ---------  Iterators ----------------
     T* begin () const noexcept { return _data; }
@@ -93,7 +100,12 @@ public:
     }
     // Not compare
     Bool operator != (const Array& other) const noexcept {
-        return !(*this == other);
+        if (_size != other._size) return true;
+	bool is_all_equals = true;
+	for (Size i = 0; i <_ size; i++) {
+		if (_data[i] != data[i]) is_all_equals = false;
+	}
+	return !is_all_equals;	
     }
 
     // Output stream
