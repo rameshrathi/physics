@@ -1,6 +1,10 @@
 # Physics/CMakeLists.txt
 
 file(GLOB PHY_SOURCES
+	Vector2D.h
+	PhysicsBody.h
+	Rectangle.h
+	PhysicsWorld.h
 	World.cpp
 	Shape.cpp
 	Force.cpp
