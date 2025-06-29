@@ -100,12 +100,14 @@ public:
     }
     // Not compare
     Bool operator != (const Array& other) const noexcept {
-        if (_size != other._size) return true;
-	bool is_all_equals = true;
-	for (Size i = 0; i < _size; i++) {
-		if (_data[i] != data[i]) is_all_equals = false;
-	}
-	return !is_all_equals;	
+        if (_size != other._size) 
+            return true;
+	    bool is_all_equals = true;
+	    for (Size i = 0; i < _size; i++) {
+		    if (_data[i] != other._data[i])
+            is_all_equals = false;
+	    }
+	    return !is_all_equals;	
     }
 
     // Output stream
